@@ -128,12 +128,91 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
   .focus .fk{display:none}
 }
 @media (prefers-reduced-motion:reduce){.mv-fig .bal{animation:none}.passport,.dissolve,.focus{transition:none}}
+
+/* ---- add watch ---- */
+.addw{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(6,9,11,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .35s}
+.addw.on{opacity:1}
+.addw-panel{position:relative;width:min(560px,100%);max-height:calc(100% - 8px);display:flex;flex-direction:column;background:rgba(14,19,22,.96);border:1px solid var(--rule);color:var(--ivory);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.addw-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--rule)}
+.addw-head h2{margin:0;font:400 22px var(--display);letter-spacing:.04em;text-align:center}
+.addw-head button{background:none;border:0;color:var(--mute);font:400 14px var(--serif);cursor:pointer;padding:6px 2px;justify-self:start}
+.addw-head button:last-child{justify-self:end;font-size:15px}
+.addw-head button:hover{color:var(--ivory)}
+.addw-body{overflow-y:auto;padding:22px 22px 26px;display:flex;flex-direction:column;gap:16px}
+.addw .lead{margin:0;color:rgba(236,230,216,.82);font-size:15.5px;line-height:1.55}
+.addw .hint-s{margin:0;color:var(--mute);font-size:13.5px;line-height:1.5}
+.ways{display:grid;gap:10px}
+.way{display:grid;gap:4px;text-align:left;background:rgba(255,255,255,.02);border:1px solid var(--rule);color:var(--ivory);padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s}
+.way:hover,.way:focus-visible{border-color:var(--gilt);background:rgba(180,147,90,.06)}
+.wn{font:400 20px var(--display);letter-spacing:.03em}
+.wd{font-size:14px;color:var(--mute);line-height:1.45}
+.drop{display:grid;gap:6px;place-items:center;text-align:center;padding:26px 16px;border:1px dashed var(--rule);cursor:pointer}
+.drop:hover{border-color:var(--gilt)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.dz{font:400 20px var(--display);color:var(--gilt)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumbs:empty{display:none}
+.thumbs img{width:64px;height:64px;object-fit:cover;border:1px solid var(--rule)}
+.sim{border:1px dashed rgba(154,160,162,.35);padding:10px 14px 12px;margin:0;display:grid;gap:6px;font-size:13.5px;color:var(--mute)}
+.sim legend{font:600 11px var(--sc);letter-spacing:.24em;font-variant:small-caps;color:var(--mute);padding:0 6px}
+.sim label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.sim input{accent-color:#b4935a}
+.acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.acts.col{flex-direction:column;align-items:stretch}
+.addw .pri{font:400 15px var(--serif);letter-spacing:.03em;background:var(--gilt);color:#15120c;border:1px solid var(--gilt);padding:11px 18px;cursor:pointer}
+.addw .pri:disabled{opacity:.4;cursor:default}
+.addw .sec{font:400 15px var(--serif);letter-spacing:.03em;background:none;color:var(--ivory);border:1px solid var(--rule);padding:10px 16px;cursor:pointer;text-align:center}
+.addw .sec:hover{border-color:var(--gilt)}
+.fld{display:grid;gap:6px;min-width:0}
+.fld>span{font-size:13px;color:var(--mute);letter-spacing:.04em;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fld input,.fld select{width:100%;box-sizing:border-box;min-height:44px;background:transparent;border:0;border-bottom:1px solid rgba(236,230,216,.25);color:var(--ivory);font:400 17px var(--serif);padding:6px 0;border-radius:0}
+.fld select option{background:#141b1f}
+.fld input:focus,.fld select:focus{outline:none;border-bottom-color:var(--gilt)}
+.fld input::placeholder{color:rgba(154,160,162,.55);font-style:italic}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#dt-form{display:grid;gap:16px}
+.prov-chip{font:600 10px var(--sc);letter-spacing:.18em;font-variant:small-caps;padding:2px 7px;border:1px solid var(--rule);color:var(--gilt)}
+.prov-manual{color:var(--mute);border-color:rgba(154,160,162,.35)}
+.srcs{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.srcs li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--mute);min-width:0}
+.srcs img{width:30px;height:30px;object-fit:cover}
+.srcs .u{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;color:rgba(236,230,216,.8)}
+.srcs em{font-style:italic;white-space:nowrap}
+.srcs .lk{color:var(--gilt)}
+.ladder{display:grid;gap:2px}
+.rung{display:grid;grid-template-columns:14px 110px minmax(0,1fr);align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(180,147,90,.15);color:var(--mute);transition:color .3s}
+.rung .dot{width:8px;height:8px;transform:rotate(45deg);border:1px solid currentColor;transition:background .3s}
+.rung em{font-style:normal;color:var(--ivory);overflow-wrap:anywhere}
+.rung.ok{color:var(--ivory)}.rung.ok .dot{background:var(--gilt);border-color:var(--gilt)}
+.rung.maybe{color:var(--ivory)}.rung.maybe .dot{border-color:var(--gilt)}.rung.maybe em{color:var(--mute);font-style:italic}
+.rung.no em{color:var(--mute);font-style:italic}
+.ladder.small .rung{padding:6px 0;font-size:14px}
+.verdict{text-align:center;padding:6px 0 4px}
+.verdict .kick{margin:0;font:600 12px var(--sc);letter-spacing:.3em;font-variant:small-caps;color:var(--gilt)}
+.vb{margin:10px 0 0;font:400 clamp(26px,5vw,32px)/1.1 var(--display);letter-spacing:.03em}
+.vr{margin:8px 0 0;font:400 17px var(--serif);color:rgba(236,230,216,.85);letter-spacing:.04em}
+.vr.unk{font-style:italic;color:var(--mute)}
+.cands{display:grid;gap:8px}
+.cand{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;text-align:left;background:none;border:1px solid var(--rule);color:var(--ivory);padding:12px 14px;cursor:pointer}
+.cand:hover{border-color:var(--gilt)}
+.cb{font:600 11px var(--sc);letter-spacing:.24em;font-variant:small-caps;color:var(--gilt)}
+.cm{font:400 19px var(--display);letter-spacing:.03em}
+.cr{font-size:14px;color:var(--mute);overflow-wrap:anywhere}
+.meter{height:2px;background:rgba(180,147,90,.18);margin-top:8px}.meter i{display:block;height:100%;background:var(--gilt)}
+.cand.none{border-style:dashed}
+.results{display:grid;gap:8px}
+.slots{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:6px;padding:10px;border:1px solid var(--rule);background:rgba(221,208,184,.06)}
+.cell{aspect-ratio:1.05;border:1px solid var(--rule);background:none;color:var(--mute);font:400 15px var(--display);cursor:pointer}
+.cell.full{background:rgba(236,230,216,.08);border-color:transparent;cursor:default}
+.cell.sel{border-color:var(--gilt);color:var(--ivory);background:rgba(180,147,90,.14)}
+.addw .err{margin:0;color:#e2a08c;font-size:14px}
+.addw-toast{position:absolute;left:16px;right:16px;bottom:16px;margin:0;padding:10px 14px;background:var(--ivory);color:#15120c;font-size:14px}
+@media (max-width:560px){.addw{padding:0}.addw-panel{width:100%;height:100%;max-height:none;border:0}.two{grid-template-columns:minmax(0,1fr)}.rung{grid-template-columns:14px 92px minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.addw{transition:none}}
 .veil{position:fixed;inset:0;background:var(--night);transition:opacity 1s;pointer-events:none}
 </style>
 
 <div id="stage"></div>
 <header class="plate"><h1>Maoz Dayan</h1><span class="rule" aria-hidden="true"></span><span class="sc">Private Collection</span></header>
-<nav class="bar" dir="rtl"><button class="primary" id="b-lid">פתיחת המכסה</button><button id="b-reset">איפוס מבט</button></nav>
+<nav class="bar" dir="rtl"><button id="b-add">+ הוספת שעון</button><button class="primary" id="b-lid">פתיחת המכסה</button><button id="b-reset">איפוס מבט</button></nav>
 <div class="focus" id="focus" hidden aria-live="polite"><span class="fk" id="focus-k"></span><span class="fn" id="focus-n"></span><button id="focus-open">View watch</button></div>
 <div class="dissolve" id="dissolve" hidden></div>
 <article class="passport" id="passport" hidden aria-label="Watch passport">
@@ -142,6 +221,13 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
   <p class="demo-note" id="demo-note">Demo collection · ownership details are examples</p>
   <div class="pp-body" id="pp-body"></div>
 </article>
+<section class="addw" id="addw" hidden role="dialog" aria-modal="true" aria-labelledby="addw-title">
+  <div class="addw-panel">
+    <header class="addw-head"><button id="addw-back">Cancel</button><h2 id="addw-title">Add a watch</h2><button id="addw-close" aria-label="Close">✕</button></header>
+    <div class="addw-body" id="addw-body"></div>
+    <p class="addw-toast" id="addw-toast" hidden role="status"></p>
+  </div>
+</section>
 <div class="veil" id="veil"></div>
 
 <script type="importmap">
@@ -879,7 +965,9 @@ function setOpen(open){
 const focusPill = document.getElementById("focus");
 function titleOf(e){
   const c = e.catalogueId && CATALOGUE[e.catalogueId];
-  return c ? { kicker:c.brand, name:c.model } : { kicker:"Awaiting identification", name:e.described?.label || "Watch" };
+  if (c) return { kicker:c.brand, name:c.model };
+  const d = e.described || {};
+  return d.brand ? { kicker:d.brand, name:d.model || d.collection || "Watch" } : { kicker:"Awaiting identification", name:d.label || "Watch" };
 }
 function focusCell(cell){
   if (state.focus === cell) return openPassport(cell);
@@ -1027,7 +1115,7 @@ function renderPassport(){
       <h1>${esc(c ? c.model : t.name)}</h1>
       ${c ? `<p class="variant">${esc(c.variant)}</p>` : `<p class="variant">${esc(e.described?.detail || "")}</p>`}
       <dl class="strip">
-        ${row("Reference", c ? esc(c.reference) : UNKNOWN)}
+        ${row("Reference", c ? esc(c.reference) : e.described?.reference ? esc(e.described.reference) : UNKNOWN)}
         ${row("Year", v(o.year))}
         ${row("Status", o.status === "owned" ? "In the collection" : esc(o.status))}
         ${row("In collection since", since ? esc(since) : NOTREC)}
@@ -1072,6 +1160,315 @@ document.getElementById("pp-back").addEventListener("click", closePassport);
 document.querySelectorAll("[data-viewer]").forEach(b => b.addEventListener("click", () => { viewer = b.dataset.viewer; renderPassport(); }));
 document.querySelectorAll("[data-hero]").forEach(b => b.addEventListener("click", () => heroView(b.dataset.hero)));
 
+/* =====================================================================
+   ADD WATCH — three ways in (photo, link, manual), one Watch record out.
+   Every source contributes fields to the same draft; each field keeps where it came from
+   and how sure we are. Identification helps; it never blocks: any state can continue to save.
+   The identifier below is SIMULATED for this prototype; the real engine will return the same shapes.
+   ===================================================================== */
+const LEVELS = ["brand", "collection", "model", "reference", "variant"];
+const LEVEL_LABEL = { brand:"Brand", collection:"Collection", model:"Model", reference:"Reference", variant:"Variant", year:"Year" };
+// Identity-only reference index for search and candidates. Specs live in CATALOGUE only where known.
+const REF_INDEX = [
+  { brand:"Rolex", collection:"Submariner", model:"Submariner", reference:"124060", variant:"No Date · black dial", catalogueId:"rolex-submariner-124060" },
+  { brand:"Rolex", collection:"Cosmograph Daytona", model:"Cosmograph Daytona", reference:"116500LN", variant:"White dial", catalogueId:"rolex-daytona-116500ln" },
+  { brand:"Rolex", collection:"GMT-Master II", model:"GMT-Master II", reference:"126710BLRO", variant:"Blue and red bezel" },
+  { brand:"Omega", collection:"Speedmaster", model:"Speedmaster Professional Moonwatch", reference:"310.30.42.50.01.001", variant:"Hesalite crystal" },
+  { brand:"Omega", collection:"Speedmaster", model:"Speedmaster Professional Moonwatch", reference:"311.30.42.30.01.005", variant:"Hesalite crystal, calibre 1861" },
+  { brand:"Omega", collection:"Seamaster", model:"Seamaster Diver 300M", reference:"210.30.42.20.01.001", variant:"Black dial, steel bracelet" },
+  { brand:"Tudor", collection:"Black Bay", model:"Black Bay Chrono", reference:"79360N", variant:"" },
+  { brand:"Patek Philippe", collection:"Aquanaut", model:"Aquanaut", reference:"5167A-001", variant:"Steel, black dial" },
+  { brand:"Patek Philippe", collection:"Nautilus", model:"Nautilus", reference:"5711/1A-010", variant:"Blue dial" },
+  { brand:"Audemars Piguet", collection:"Royal Oak", model:"Royal Oak Jumbo Extra-Thin", reference:"15202ST.OO.1240ST.01", variant:"Blue dial" },
+  { brand:"Grand Seiko", collection:"Heritage", model:"Snowflake", reference:"SBGA211", variant:"Spring Drive" }
+];
+const SIM_PHOTO = {
+  confident:  { label:"Confident match", candidates:[{ ref:1, conf:{ brand:.99, collection:.98, model:.97, reference:.93, variant:.9 } }] },
+  candidates: { label:"Several candidates", candidates:[
+                { ref:3, conf:{ brand:.97, collection:.95, model:.82, reference:.58, variant:.5 } },
+                { ref:4, conf:{ brand:.97, collection:.95, model:.82, reference:.31, variant:.3 } },
+                { ref:6, conf:{ brand:.2, collection:.18, model:.16, reference:.11, variant:.1 } }] },
+  modelOnly:  { label:"Model identified, reference unknown", candidates:[{ ref:7, conf:{ brand:.98, collection:.95, model:.91, reference:0, variant:0 } }] },
+  none:       { label:"Not recognised", candidates:[] }
+};
+const CONFIDENT = 0.8; // below this a level is never asserted, only offered
+
+/* ---------- the draft record ---------- */
+let draft = null, addStep = "method", addHistory = [], simPhoto = "confident", simLink = "auto", addSlot = null, addBusy = false;
+function newDraft(slot){
+  return { id:"w-" + Date.now().toString(36), slot, catalogueId:null,
+    identification:{ status:"unidentified", method:null, candidates:[], chosen:null },
+    fields:{},            // field -> { value, source, confidence }
+    sources:[],           // { type:"photo"|"link"|"manual", ... }
+    owned:{ status:"owned", year:null, acquisition:null, startedOn:null, condition:null, box:null, papers:null, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } };
+}
+// A source only fills a field if it is empty or the new value is more trustworthy. Manual input always wins.
+const RANK = { manual:3, link:2, photo:1, search:3 };
+function contribute(source, values, confidence = {}){
+  for (const [k, v] of Object.entries(values)){
+    if (v === undefined || v === null || v === "") continue;
+    const cur = draft.fields[k], conf = confidence[k] ?? 1;
+    if (source !== "manual" && source !== "search" && conf < CONFIDENT) continue;
+    if (!cur || RANK[source] >= RANK[cur.source]) draft.fields[k] = { value:v, source, confidence:conf };
+  }
+}
+const F = k => draft.fields[k]?.value ?? "";
+
+/* ---------- simulated engines ---------- */
+const wait = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
+async function identifyPhotos(){
+  const sim = SIM_PHOTO[simPhoto];
+  return sim.candidates.map(c => ({ ...REF_INDEX[c.ref], conf:c.conf }));
+}
+// Link reading: recognises a few page patterns; anything else is kept as a source for manual entry.
+function readLink(url){
+  const u = url.toLowerCase();
+  const mode = simLink !== "auto" ? simLink : (/rolex\.com.*m?116500ln/.test(u) || /rolex\.com.*m?124060/.test(u) || /patek\.com.*5167a/.test(u)) ? "full" : /chrono24|watchfinder|hodinkee|omega/.test(u) ? "partial" : "failed";
+  if (mode === "failed") return { status:"failed", fields:{} };
+  if (mode === "full"){
+    const r = /124060/.test(u) ? REF_INDEX[0] : /5167a/.test(u) ? REF_INDEX[7] : REF_INDEX[1];
+    return { status:"parsed", fields:{ brand:r.brand, collection:r.collection, model:r.model, reference:r.reference, variant:r.variant }, catalogueId:r.catalogueId || null };
+  }
+  const r = /omega/.test(u) ? REF_INDEX[3] : REF_INDEX[2];
+  return { status:"partial", fields:{ brand:r.brand, collection:r.collection, model:r.model, year:"2021" } };
+}
+
+/* ---------- shell ---------- */
+const addEl = document.getElementById("addw"), addBody = document.getElementById("addw-body"), addTitle = document.getElementById("addw-title");
+function openAdd(slot = null){
+  if (state.focus) unfocus(true);
+  draft = newDraft(slot); addSlot = slot; addHistory = []; addBusy = false;
+  addEl.hidden = false; requestAnimationFrame(() => addEl.classList.add("on"));
+  addGo("method", true);
+}
+function closeAdd(){ addEl.classList.remove("on"); setTimeout(() => { addEl.hidden = true; addBody.innerHTML = ""; }, 400); draft = null; }
+function addGo(step, reset = false){ if (!reset && addStep !== step && addStep !== "analyzing") addHistory.push(addStep); if (reset) addHistory = []; addStep = step; drawAdd(); addBody.scrollTop = 0; }
+function addBack(){ if (addBusy) return; const prev = addHistory.pop(); if (prev){ addStep = prev; drawAdd(); } else closeAdd(); }
+document.getElementById("addw-back").addEventListener("click", addBack);
+document.getElementById("addw-close").addEventListener("click", closeAdd);
+document.getElementById("b-add").addEventListener("click", () => openAdd(null));
+
+const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "photo" ? `Photo · ${Math.round(f.confidence * 100)}%` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
+const srcList = () => draft.sources.length ? `<ul class="srcs">${draft.sources.map(s => `<li>${s.type === "photo" ? `<img src="${s.thumb}" alt="">Photo` : s.type === "link" ? `<span class="lk">↗</span><span class="u">${esc(s.url)}</span><em>${s.status === "failed" ? "kept as a source" : s.status === "partial" ? "partly read" : "read"}</em>` : "Manual entry"}</li>`).join("")}</ul>` : "";
+
+function drawAdd(){
+  const T = { method:"Add a watch", photo:"Identify from photos", link:"Identify from a link", analyzing:"Identifying", result:"Identification", search:"Find the reference", details:"Confirm the details", place:"Place it in the box" };
+  addTitle.textContent = T[addStep] || "Add a watch";
+  document.getElementById("addw-back").textContent = addHistory.length ? "← Back" : "Cancel";
+  addBody.innerHTML = VIEWS[addStep]();
+  WIRE[addStep] && WIRE[addStep]();
+}
+
+/* ---------- steps ---------- */
+const VIEWS = {
+  method: () => `<p class="lead">Three ways in. All of them create the same record, and you can mix them along the way.</p>
+    <div class="ways">
+      <button class="way" data-go="photo"><span class="wn">Identify from photos</span><span class="wd">Upload or take one or more photos of the watch.</span></button>
+      <button class="way" data-go="link"><span class="wn">Identify from a link</span><span class="wd">Paste a page that shows the watch: a brand page, a listing or an article.</span></button>
+      <button class="way" data-go="details" data-manual="1"><span class="wn">Add manually</span><span class="wd">Type what you know. Only the brand is needed; everything else can wait.</span></button>
+    </div>`,
+  photo: () => `<label class="drop" for="ph-in"><span class="dz">Add photos</span><span class="wd">The dial straight on works best. The caseback and the clasp help with the reference.</span><input id="ph-in" type="file" accept="image/*" multiple></label>
+    <div class="thumbs">${draft.sources.filter(s => s.type === "photo").map(s => `<img src="${s.thumb}" alt="">`).join("")}</div>
+    <fieldset class="sim"><legend>Prototype · simulated result</legend>${Object.entries(SIM_PHOTO).map(([k, s]) => `<label><input type="radio" name="sim" value="${k}" ${simPhoto === k ? "checked" : ""}> ${s.label}</label>`).join("")}</fieldset>
+    <div class="acts"><button class="pri" id="ph-go" ${draft.sources.some(s => s.type === "photo") ? "" : "disabled"}>Identify</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
+  link: () => `<label class="fld"><span>Page address</span><input id="ln-in" type="url" inputmode="url" placeholder="https://" autocomplete="off"></label>
+    <p class="hint-s">Not every site can be read automatically. If it can't, the link is still saved with the watch.</p>
+    <fieldset class="sim"><legend>Prototype · simulated reading</legend>${[["auto", "Decide from the address"], ["full", "Page read in full"], ["partial", "Page partly read"], ["failed", "Page can't be read"]].map(([k, l]) => `<label><input type="radio" name="siml" value="${k}" ${simLink === k ? "checked" : ""}> ${l}</label>`).join("")}</fieldset>
+    <div class="acts"><button class="pri" id="ln-go">Read the page</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
+  analyzing: () => `<div class="ladder">${LEVELS.map(l => `<div class="rung" data-l="${l}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em></em></div>`).join("")}</div><p class="hint-s" id="an-msg">${draft.identification.method === "link" ? "Reading the page" : "Looking at the dial, case and bracelet"}</p>`,
+  result: () => {
+    const cands = draft.identification.candidates, top = cands[0];
+    const ladder = c => `<div class="ladder small">${LEVELS.map(l => { const k = c.conf[l] ?? 0; return `<div class="rung ${k >= CONFIDENT ? "ok" : k > 0 ? "maybe" : "no"}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em>${k >= CONFIDENT ? esc(c[l] || "—") : k > 0 ? "Not certain" : "Unknown"}</em></div>`; }).join("")}</div>`;
+    if (!cands.length) return `<div class="verdict"><p class="kick">Not recognised</p><p class="lead">We couldn't identify this watch from the photos. That's fine: add it yourself, and identification can try again later with more photos.</p></div>
+      ${srcList()}<div class="acts col"><button class="pri" data-go="details" data-manual="1">Add manually</button><button class="sec" data-go="photo">Add another photo</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="search">Search for the reference</button></div>`;
+    const confident = cands.length === 1 && (top.conf.reference ?? 0) >= CONFIDENT;
+    const modelOnly = cands.length === 1 && (top.conf.model ?? 0) >= CONFIDENT && (top.conf.reference ?? 0) < CONFIDENT;
+    if (confident) return `<div class="verdict"><p class="kick">We think this is</p><p class="vb">${esc(top.brand)} ${esc(top.model)}</p><p class="vr">${esc(top.reference)}${top.variant ? " — " + esc(top.variant) : ""}</p></div>${ladder(top)}
+      <div class="acts col"><button class="pri" data-pick="0">Yes, this is my watch</button><button class="sec" data-go="search">It's a different reference</button><button class="sec" data-go="details" data-manual="1">None of these · add manually</button></div>`;
+    if (modelOnly) return `<div class="verdict"><p class="kick">We recognise the model</p><p class="vb">${esc(top.brand)} ${esc(top.model)}</p><p class="vr unk">Reference not certain</p></div>${ladder(top)}
+      <p class="lead">To narrow it down to the exact reference:</p>
+      <div class="acts col"><button class="sec" data-go="photo">Add another photo · caseback or clasp</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="search" data-q="${esc(top.brand + " " + top.model)}">Search the references</button><button class="pri" data-pick="0" data-noref="1">Continue with the reference unknown</button></div>`;
+    return `<div class="verdict"><p class="kick">It could be one of these</p><p class="lead">Pick the one that matches your watch.</p></div>
+      <div class="cands">${cands.map((c, i) => `<button class="cand" data-pick="${i}"><span class="cb">${esc(c.brand)}</span><span class="cm">${esc(c.model)}</span><span class="cr">${esc(c.reference)}${c.variant ? " — " + esc(c.variant) : ""}</span><span class="meter"><i style="width:${Math.round((c.conf.reference || c.conf.model) * 100)}%"></i></span></button>`).join("")}
+      <button class="cand none" data-go="details" data-manual="1"><span class="cm">None of these</span><span class="cr">Add manually</span></button></div>
+      <div class="acts col"><button class="sec" data-go="photo">Add another photo</button><button class="sec" data-go="link">Paste a link</button></div>`;
+  },
+  search: () => `<label class="fld"><span>Brand, model or reference</span><input id="sr-in" type="search" autocomplete="off" placeholder="e.g. Aquanaut, 5167A, Speedmaster" value="${esc(draft._q || "")}"></label>
+    <div class="results" id="sr-out"></div>
+    <div class="acts col"><button class="sec" data-go="details" data-manual="1">Can't find it · add manually</button></div>`,
+  details: () => {
+    const fld = (k, ph = "", req = false) => `<label class="fld"><span>${LEVEL_LABEL[k]}${req ? " · required" : ""} ${chip(draft.fields[k])}</span><input data-f="${k}" value="${esc(F(k))}" placeholder="${ph}" autocomplete="off" ${req ? "required" : ""}></label>`;
+    const refUnknown = !F("reference");
+    return `${srcList()}
+      <form id="dt-form" novalidate>
+        ${fld("brand", "Patek Philippe", true)}
+        <div class="two">${fld("collection", "Aquanaut")}${fld("model", "Aquanaut")}</div>
+        <label class="fld"><span>Reference ${chip(draft.fields.reference)}</span><input data-f="reference" value="${esc(F("reference"))}" placeholder="Unknown" autocomplete="off"></label>
+        <p class="hint-s">${refUnknown ? "Leave the reference empty if you don't know it. The watch is saved as reference unknown and can be identified later." : "&nbsp;"}</p>
+        <div class="two">${fld("variant", "Dial, material, bracelet")}${fld("year", "Unknown")}</div>
+        <div class="two"><label class="fld"><span>In your collection since</span><input type="date" id="dt-since" value="${esc(draft.owned.startedOn || "")}"></label>
+          <label class="fld"><span>How it came to you</span><select id="dt-acq"><option value="">Not recorded</option>${Object.entries(ACQ_LABEL).map(([k, l]) => `<option value="${k}" ${draft.owned.acquisition === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
+        <p class="hint-s">Serial number, price and documents can be added later from the watch's passport. They stay private.</p>
+        <p class="err" id="dt-err" hidden></p>
+        <div class="acts"><button class="pri" type="submit">Add to collection</button></div>
+      </form>`;
+  },
+  place: () => {
+    const L = OPTIONS.layouts[CONFIG.layout], n = L.cols * L.rows, free = [];
+    for (let i = 0; i < n; i++) if (!entryAt(i)) free.push(i);
+    const grid = Array.from({ length:n }, (_, i) => `<button class="cell ${entryAt(i) ? "full" : ""} ${addSlot === i ? "sel" : ""}" ${entryAt(i) ? "disabled" : `data-slot="${i}"`} aria-label="Compartment ${i + 1}">${entryAt(i) ? "" : i + 1}</button>`).join("");
+    return `<div class="verdict"><p class="kick">Added to your collection</p><p class="vb">${esc([F("brand"), F("model") || F("collection")].filter(Boolean).join(" "))}</p><p class="vr ${F("reference") ? "" : "unk"}">${F("reference") ? esc(F("reference")) : "Reference unknown"}</p></div>
+      ${free.length ? `<p class="lead">Choose a compartment, or keep it in the collection without a place in the box.</p><div class="slots" style="--cols:${L.cols}">${grid}</div>` : `<p class="lead">This box is full. The watch is in your collection, and you can give it a place when one is free.</p>`}
+      <div class="acts col">${free.length ? `<button class="pri" id="pl-go">Place it in the box</button>` : ""}<button class="sec" id="pl-skip">Keep it outside the box</button></div>`;
+  }
+};
+
+const WIRE = {
+  method(){ wireGo(); },
+  photo(){
+    wireGo();
+    document.querySelectorAll('[name="sim"]').forEach(r => r.addEventListener("change", () => simPhoto = r.value));
+    document.getElementById("ph-in").addEventListener("change", async e => {
+      for (const file of [...e.target.files].slice(0, 6)){ try { draft.sources.push({ type:"photo", name:file.name, thumb:await thumbOf(file), at:new Date().toISOString() }); } catch {} }
+      drawAdd();
+    });
+    document.getElementById("ph-go").addEventListener("click", runPhoto);
+  },
+  link(){
+    wireGo();
+    document.querySelectorAll('[name="siml"]').forEach(r => r.addEventListener("change", () => simLink = r.value));
+    const go = () => { const url = document.getElementById("ln-in").value.trim(); if (!/^https?:\/\/\S+\.\S+/i.test(url)){ document.getElementById("ln-in").focus(); document.getElementById("ln-in").setCustomValidity("Paste a full address starting with https://"); document.getElementById("ln-in").reportValidity(); return; } runLink(url); };
+    document.getElementById("ln-go").addEventListener("click", go);
+    document.getElementById("ln-in").addEventListener("input", e => e.target.setCustomValidity(""));
+    document.getElementById("ln-in").addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  },
+  result(){
+    wireGo();
+    document.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => {
+      const c = draft.identification.candidates[+b.dataset.pick];
+      const conf = { ...c.conf }; if (b.dataset.noref){ conf.reference = 0; conf.variant = 0; }
+      // the collector's confirmation turns the candidate into fact, except the levels left unknown
+      const vals = {}; for (const l of LEVELS) if (!(b.dataset.noref && (l === "reference" || l === "variant"))) vals[l] = c[l];
+      contribute("search", vals);
+      for (const l of Object.keys(vals)) if (draft.fields[l]?.source === "search") { draft.fields[l].confidence = conf[l] ?? 1; draft.fields[l].source = "photo"; }
+      draft.identification.chosen = c; draft.catalogueId = b.dataset.noref ? null : (c.catalogueId || null);
+      addGo("details");
+    }));
+  },
+  search(){
+    wireGo();
+    const inp = document.getElementById("sr-in"), out = document.getElementById("sr-out");
+    const render = () => {
+      draft._q = inp.value; const q = inp.value.trim().toLowerCase();
+      const hits = q.length < 2 ? [] : REF_INDEX.filter(r => [r.brand, r.collection, r.model, r.reference, r.variant].join(" ").toLowerCase().includes(q) || q.split(/\s+/).every(t => [r.brand, r.model, r.reference].join(" ").toLowerCase().includes(t)));
+      out.innerHTML = q.length < 2 ? `<p class="hint-s">Type at least two letters.</p>` : hits.length ? hits.map(r => `<button class="cand" data-ref="${REF_INDEX.indexOf(r)}"><span class="cb">${esc(r.brand)}</span><span class="cm">${esc(r.model)}</span><span class="cr">${esc(r.reference)}${r.variant ? " — " + esc(r.variant) : ""}</span></button>`).join("") : `<p class="hint-s">No reference matches. Add it manually; it can be matched later.</p>`;
+      out.querySelectorAll("[data-ref]").forEach(b => b.addEventListener("click", () => { const r = REF_INDEX[+b.dataset.ref]; contribute("search", { brand:r.brand, collection:r.collection, model:r.model, reference:r.reference, variant:r.variant }); draft.catalogueId = r.catalogueId || null; addGo("details"); }));
+    };
+    inp.addEventListener("input", render); render(); inp.focus();
+  },
+  details(){
+    const form = document.getElementById("dt-form");
+    form.addEventListener("input", e => { const k = e.target.dataset.f; if (k){ const v = e.target.value.trim(); if (v) draft.fields[k] = { value:v, source:"manual", confidence:1 }; else delete draft.fields[k]; } });
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      if (!F("brand")){ const er = document.getElementById("dt-err"); er.textContent = "Add the brand. Everything else can be completed later."; er.hidden = false; form.querySelector('[data-f="brand"]').focus(); return; }
+      draft.owned.startedOn = document.getElementById("dt-since").value || null;
+      draft.owned.acquisition = document.getElementById("dt-acq").value || null;
+      draft.owned.year = F("year") ? +F("year") || F("year") : null;
+      if (!draft.sources.some(s => s.type === "manual") && (!draft.sources.length || Object.values(draft.fields).some(f => f.source === "manual"))) draft.sources.push({ type:"manual", at:new Date().toISOString() });
+      // a reference typed by hand that matches the catalogue links it; otherwise model-level data stays unknown
+      const ref = F("reference").toUpperCase();
+      const known = REF_INDEX.find(r => r.reference.toUpperCase() === ref && r.catalogueId);
+      if (known && !draft.catalogueId) draft.catalogueId = known.catalogueId;
+      if (!ref) draft.catalogueId = null;
+      saveDraft(); addGo("place");
+    });
+  },
+  place(){
+    document.querySelectorAll("[data-slot]").forEach(b => b.addEventListener("click", () => { addSlot = +b.dataset.slot; document.querySelectorAll(".cell").forEach(c => c.classList.toggle("sel", c === b)); }));
+    const pl = document.getElementById("pl-go");
+    if (pl) pl.addEventListener("click", () => {
+      if (addSlot == null){ const L = OPTIONS.layouts[CONFIG.layout]; for (let i = 0; i < L.cols * L.rows; i++) if (!entryAt(i)){ addSlot = i; break; } }
+      finish(addSlot);
+    });
+    document.getElementById("pl-skip").addEventListener("click", () => finish(null));
+  }
+};
+function wireGo(){
+  addBody.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.manual && !draft.sources.some(s => s.type === "manual")) draft.sources.push({ type:"manual", at:new Date().toISOString() });
+    if (b.dataset.q) draft._q = b.dataset.q;
+    addGo(b.dataset.go);
+  }));
+}
+
+/* ---------- running the (simulated) identifiers ---------- */
+async function climb(results){
+  // reveal the hierarchy one level at a time, stopping where confidence runs out
+  for (const l of LEVELS){
+    await wait(420);
+    const el = addBody.querySelector(`.rung[data-l="${l}"]`); if (!el) return;
+    const k = results ? results[l] ?? 0 : 0;
+    el.classList.add(k >= CONFIDENT ? "ok" : k > 0 ? "maybe" : "no");
+  }
+  await wait(380);
+}
+async function runPhoto(){
+  draft.identification.method = "photo"; addBusy = true; addGo("analyzing");
+  const cands = await identifyPhotos();
+  // merge with anything already known (a link read earlier may have fixed the brand)
+  const best = cands[0]?.conf || null;
+  await climb(cands.length > 1 ? { brand:cands[0].conf.brand, collection:cands[0].conf.collection, model:cands[0].conf.model * .9, reference:.4, variant:.3 } : best);
+  draft.identification.candidates = cands; draft.identification.status = cands.length ? "candidates" : "unrecognised";
+  if (cands.length === 1) for (const l of ["brand", "collection", "model"]) contribute("photo", { [l]:cands[0][l] }, cands[0].conf);
+  addBusy = false; addGo("result");
+}
+async function runLink(url){
+  draft.identification.method = "link"; addBusy = true; addGo("analyzing");
+  const res = readLink(url);
+  const conf = Object.fromEntries(LEVELS.map(l => [l, res.fields[l] ? 1 : 0]));
+  await climb(res.status === "failed" ? null : conf);
+  draft.sources.push({ type:"link", url, status:res.status, extracted:res.fields, at:new Date().toISOString() });
+  addBusy = false;
+  if (res.status === "failed"){ addGo("details"); toastAdd("This page couldn't be read. The link is saved with the watch; add the details yourself."); return; }
+  contribute("link", res.fields);
+  if (res.catalogueId) draft.catalogueId = res.catalogueId;
+  addGo("details");
+  toastAdd(res.status === "parsed" ? "Read from the page. Check the details below." : "Part of the page could be read. Complete the rest below.");
+}
+function toastAdd(msg){ const t = document.getElementById("addw-toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastAdd.t); toastAdd.t = setTimeout(() => t.hidden = true, 5200); }
+async function thumbOf(file){
+  const bmp = await createImageBitmap(file); const s = Math.min(1, 240 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s); c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.8);
+}
+
+/* ---------- saving: the draft becomes a collection entry ---------- */
+let savedEntry = null;
+function saveDraft(){
+  const d = { brand:F("brand"), collection:F("collection"), model:F("model"), reference:F("reference"), variant:F("variant") };
+  const linked = draft.catalogueId ? COLLECTION.find(e => e && e.catalogueId === draft.catalogueId) : null;
+  savedEntry = {
+    id:draft.id, slot:null, catalogueId:draft.catalogueId,
+    identification:{ status:draft.catalogueId ? "identified" : d.reference ? "reference-known" : "unidentified", method:draft.identification.method || "manual",
+      fields:draft.fields },
+    described:{ ...d, label:[d.model || d.collection || "Watch"].join(" "), detail:d.variant || "" },
+    sources:draft.sources,
+    // the 3D look: the catalogue model's look when known, otherwise a neutral watch until identified
+    look:linked ? JSON.parse(JSON.stringify(linked.look)) : { metal:"steel", dial:{ base:"#2b2f34", base2:"#1c1f23", sun:true, style:"baton", ind:"#e8eaee" }, band:"bracelet", hands:{ central:["h", "m", "s"] } },
+    owned:draft.owned, private:draft.private, added:true
+  };
+  COLLECTION.push(savedEntry); persistAdded();
+}
+function finish(slot){
+  savedEntry.slot = slot; persistAdded(); closeAdd();
+  buildBox();
+  if (slot != null) setTimeout(() => { const cell = cells.find(c => c.userData.slot === slot); if (cell) focusCell(cell); }, 500);
+}
+function persistAdded(){ try { localStorage.setItem("ecrin-added", JSON.stringify(COLLECTION.filter(e => e && e.added))); } catch {} }
+function restoreAdded(){ try { const a = JSON.parse(localStorage.getItem("ecrin-added") || "[]"); for (const e of a) if (!COLLECTION.some(x => x && x.id === e.id)) COLLECTION.push(e); } catch {} }
+
 /* ============ picking ============ */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
 renderer.domElement.addEventListener("pointerdown", e => { down = { x:e.clientX, y:e.clientY, t:performance.now() }; });
@@ -1083,7 +1480,7 @@ renderer.domElement.addEventListener("pointerup", e => {
   if (!hits.length){ if (state.focus) unfocus(); return; }
   if (!state.open) return setOpen(true);
   let o = hits[0].object; while (o && !(o.userData && "slot" in o.userData)) o = o.parent;
-  if (o && o.userData.watch) focusCell(o); else if (state.focus) unfocus();
+  if (o && o.userData.watch) focusCell(o); else if (o && "slot" in o.userData) openAdd(o.userData.slot); else if (state.focus) unfocus();
 });
 
 /* ============ render loop (only while something changes) ============ */
@@ -1101,18 +1498,18 @@ function loop(now){
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!state.focus) frameView(false); requestRender(); });
 lidBtn.addEventListener("click", () => setOpen(!state.open));
 document.getElementById("b-reset").addEventListener("click", () => { if (state.focus) unfocus(true); frameView(true, 1.1); });
-addEventListener("keydown", e => { if (e.key !== "Escape") return; if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
+addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
 
 /* ============ start ============ */
 async function start(){
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
-  sharedGeometries(); buildBox();
+  restoreAdded(); sharedGeometries(); buildBox();
   frameView(false);
   renderer.compile(scene, camera);
   requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
-  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
+  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
 start();
 </script>
