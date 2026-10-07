@@ -1,7 +1,7 @@
 <title>Écrin Base Box</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bellefair&family=Frank+Ruhl+Libre:wght@400&family=Cormorant+SC:wght@600&family=Jost:wght@400;500&family=Bodoni+Moda:opsz,wght@6..96,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bellefair&family=Frank+Ruhl+Libre:wght@400&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Jost:wght@400;500&family=Bodoni+Moda:opsz,wght@6..96,500&display=swap">
 <style>
 /* Layout: the box alone on a midnight stage, a name plate top-left, two quiet controls at the bottom. Single dark look by design. */
 :root{
@@ -22,12 +22,126 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 .bar button:hover{color:var(--ivory);border-bottom-color:var(--gilt)}
 .bar button.primary{color:var(--gilt)}
 .bar button:focus-visible{outline:1px solid var(--gilt);outline-offset:4px}
+
+/* ---- focused watch: a quiet invitation, not a button bar ---- */
+.focus{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);transform:translate(-50%,8px);opacity:0;transition:opacity .45s,transform .45s;
+  display:flex;align-items:center;gap:14px;padding:10px 12px 10px 18px;background:rgba(13,18,21,.55);border:1px solid var(--rule);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:calc(100% - 32px)}
+.focus.on{opacity:1;transform:translate(-50%,0)}
+.focus .fk{font:600 11px var(--sc);letter-spacing:.3em;color:var(--gilt);font-variant:small-caps;white-space:nowrap}
+.focus .fn{font:400 17px var(--display);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.focus button{font:400 13px var(--serif);letter-spacing:.06em;color:var(--ivory);background:none;border:0;border-left:1px solid var(--rule);padding:4px 4px 4px 14px;cursor:pointer;white-space:nowrap}
+.focus button:hover{color:var(--gilt)}
+.dissolve{position:fixed;inset:0;background:radial-gradient(70% 60% at 50% 45%,#1d262b,#0b0f12);opacity:0;transition:opacity .8s ease;pointer-events:none;z-index:30}
+.dissolve.on{opacity:1}
+
+/* ---- passport ---- */
+.passport{--paper:#f1ece1;--paper-2:#e8e1d2;--ink:#1d1c19;--ink-soft:#6a6358;--hair:rgba(29,28,25,.13);--gilt-d:#8d7547;
+  position:fixed;inset:0;z-index:40;overflow-y:auto;overflow-x:hidden;background:var(--paper);color:var(--ink);opacity:0;transition:opacity .7s ease;-webkit-overflow-scrolling:touch}
+.passport.on{opacity:1}
+.pp-top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4vw,40px) 14px;
+  background:linear-gradient(rgba(11,15,18,.75),rgba(11,15,18,0));color:var(--ivory)}
+.pp-top button{font:400 15px var(--serif);color:inherit;background:none;border:0;cursor:pointer;padding:6px 0;letter-spacing:.03em}
+.pp-top button:hover{color:var(--gilt)}
+.seg{display:flex;border:1px solid var(--rule)}
+.seg button{padding:6px 12px;font-size:13px;color:rgba(236,230,216,.7)}
+.seg button[aria-pressed="true"]{color:var(--night);background:var(--gilt)}
+.pp-hero{position:relative;height:min(66vh,620px);margin-top:calc(-1 * (env(safe-area-inset-top,0px) + 62px));background:radial-gradient(80% 75% at 50% 48%,#25303a 0%,#121a1f 55%,#0b0f12 100%)}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;outline:none}
+.hero-views{position:absolute;left:0;right:0;bottom:18px;display:flex;justify-content:center;gap:22px}
+.hero-views button{font:italic 400 15px "Cormorant Garamond",Georgia,serif;color:rgba(236,230,216,.6);background:none;border:0;border-bottom:1px solid transparent;cursor:pointer;padding:3px 0}
+.hero-views button[aria-pressed="true"]{color:var(--ivory);border-bottom-color:var(--gilt)}
+.demo-note{margin:0;background:#0b0f12;color:rgba(154,160,162,.8);text-align:center;font:italic 400 14px "Cormorant Garamond",Georgia,serif;padding:0 16px 6px}
+.pp-body .sc{font:600 12px var(--sc);letter-spacing:.32em;font-variant:small-caps;text-transform:none}
+.hero-meta{background:#0b0f12;color:var(--ivory);text-align:center;padding:26px clamp(16px,4vw,40px) 40px}
+.hero-meta .kick{color:var(--gilt);margin:0}
+.hero-meta h1{margin:10px 0 0;font:400 clamp(38px,6.5vw,72px)/1.02 var(--display);letter-spacing:.03em;text-wrap:balance}
+.hero-meta .variant{margin:12px auto 0;font:italic 400 20px "Cormorant Garamond",Georgia,serif;color:var(--mute);max-width:46ch}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-width:880px;margin:30px auto 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.strip .r{padding:14px 10px;border-left:1px solid var(--rule)}
+.strip .r:first-child{border-left:0}
+.strip dt{font:600 11px var(--sc);letter-spacing:.26em;color:var(--gilt);font-variant:small-caps}
+.strip dd{margin:6px 0 0;font:400 18px var(--display);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.strip .unk{color:var(--mute)}
+.ident{background:#0b0f12;color:var(--ivory);text-align:center;padding:0 clamp(16px,4vw,40px) 44px}
+.ident p{max-width:52ch;margin:12px auto 0;color:var(--mute);font-size:15px;line-height:1.6}
+.ident .sc{color:var(--gilt)}
+.pipe{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:6px 0;margin:16px 0 0;padding:0;font:400 15px var(--display);letter-spacing:.06em}
+.pipe li{display:flex;align-items:center}
+.pipe li+li::before{content:"";width:34px;height:1px;background:var(--rule);margin:0 12px}
+.ghost{margin-top:18px;font:400 14px var(--serif);color:inherit;background:none;border:1px solid currentColor;opacity:.55;padding:9px 16px;letter-spacing:.03em}
+.sec{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px 56px;max-width:1080px;margin:0 auto;padding:56px clamp(16px,5vw,56px);border-top:1px solid var(--hair)}
+.sec:first-of-type{border-top:0}
+.sec header .sc{color:var(--gilt-d)}
+.sec h2{margin:6px 0 0;font:400 34px/1.05 var(--display);letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.src{margin:12px 0 0;font:italic 400 15px "Cormorant Garamond",Georgia,serif;color:var(--ink-soft)}
+.body{min-width:0}
+.specs{margin:0;display:grid}
+.specs .r{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--hair)}
+.specs dt{font:400 14px var(--serif);color:var(--ink-soft);letter-spacing:.03em}
+.specs dd{margin:0;font-size:16px;line-height:1.5;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.unk{color:var(--ink-soft);font-style:italic;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.06em}
+.mv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:start}
+.mv-fig{margin:0;background:#ebe4d4;border:1px solid var(--hair);padding:18px}
+.mv-fig svg{display:block;width:100%;height:auto}
+.mv-fig figcaption,.chart figcaption{margin-top:10px;font:italic 400 15px "Cormorant Garamond",Georgia,serif;color:var(--ink-soft);line-height:1.4}
+.mv-fig .ln{fill:none;stroke:#2a2722;stroke-width:1.1;opacity:.75}.mv-fig .thin{stroke-width:.6;opacity:.5}.mv-fig .heavy{stroke-width:2}.mv-fig .hair{stroke-width:.5;opacity:.6}
+.mv-fig .dash{stroke-dasharray:4 5;opacity:.4}
+.mv-fig .br{fill:rgba(141,117,71,.12);stroke:#8d7547;stroke-width:1}
+.mv-fig .rotor{fill:rgba(29,28,25,.04);stroke:#2a2722;stroke-width:.8;stroke-dasharray:6 4;opacity:.7}
+.mv-fig .jw{fill:#9b2a36}
+.mv-fig .lbl path{stroke:#8d7547;stroke-width:.7;fill:none}.mv-fig .lbl text{font:italic 400 15px "Cormorant Garamond",Georgia,serif;fill:#5a5348}
+.mv-fig .bal{transform-box:fill-box;transform-origin:center;animation:swing var(--half) ease-in-out infinite alternate}
+@keyframes swing{from{transform:rotate(-38deg)}to{transform:rotate(38deg)}}
+.mv-empty{text-align:center}.mv-empty p{font:italic 400 16px "Cormorant Garamond",Georgia,serif;color:var(--ink-soft);margin:6px 0 4px}
+.lede{margin:0;font:italic 400 clamp(24px,3vw,30px)/1.3 "Cormorant Garamond",Georgia,serif;max-width:30ch}
+.essay{margin-top:22px;columns:2 300px;column-gap:40px}
+.essay h3{margin:0 0 6px;font:600 12px var(--sc);letter-spacing:.28em;font-variant:small-caps;color:var(--gilt-d);break-after:avoid}
+.essay p{margin:0 0 20px;font-size:16.5px;line-height:1.75;break-inside:avoid}
+.notable{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--hair)}
+.notable li{padding:11px 0 11px 22px;border-bottom:1px solid var(--hair);position:relative;font-size:15.5px}
+.notable li::before{content:"";position:absolute;left:3px;top:19px;width:5px;height:5px;transform:rotate(45deg);background:#b4935a}
+.story{margin-top:26px;padding:22px 24px;background:var(--paper-2);border-left:2px solid #b4935a}
+.story p{margin:0;font:italic 400 19px/1.5 "Cormorant Garamond",Georgia,serif}
+.story .ghost{color:var(--ink)}
+.empty{margin:0;font:italic 400 17px "Cormorant Garamond",Georgia,serif;color:var(--ink-soft)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair)}
+.tile{background:var(--paper);padding:20px}
+.tile .sc{color:var(--gilt-d);font-size:11px}
+.tile b{display:block;margin-top:8px;font:400 24px var(--display);color:var(--ink-soft)}
+.chart{margin:22px 0 0}.chart svg{display:block;width:100%;height:130px}.chart .ax{stroke:#2a2722;stroke-width:1;opacity:.4}.chart .grid{stroke:#2a2722;stroke-dasharray:3 6;opacity:.18}
+.hist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.hist h3{margin:0 0 10px;font:600 12px var(--sc);letter-spacing:.28em;font-variant:small-caps;color:var(--gilt-d)}
+.prov{list-style:none;margin:0;padding:0;font-size:15.5px;line-height:1.5}
+.prov b{display:block;font:400 13px var(--serif);color:var(--ink-soft);font-weight:400}
+#private{background:#141b1f;color:var(--ivory);max-width:none;border-top:0;padding-inline:max(clamp(16px,5vw,56px),calc((100% - 1080px) / 2 + clamp(16px,5vw,56px)))}
+#private header .sc{color:var(--gilt)}#private h2{color:var(--ivory)}
+#private .specs .r{border-bottom-color:rgba(236,230,216,.12)}#private .specs dt{color:var(--mute)}#private .unk{color:var(--mute)}
+.priv-note{margin:0 0 14px;font:italic 400 16px "Cormorant Garamond",Georgia,serif;color:var(--gilt)}
+.lock{color:var(--gilt);display:inline-flex}
+.colophon{display:flex;justify-content:space-between;gap:12px;max-width:1080px;margin:0 auto;padding:30px clamp(16px,5vw,56px) calc(env(safe-area-inset-bottom,0px) + 40px);font:600 12px var(--sc);letter-spacing:.3em;color:var(--gilt-d);font-variant:small-caps;border-top:3px double var(--hair)}
+@media (max-width:760px){
+  .sec{grid-template-columns:minmax(0,1fr);padding-block:40px;gap:18px}
+  .mv,.hist{grid-template-columns:minmax(0,1fr)}
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr))}.strip .r:nth-child(3){border-left:0}.strip .r:nth-child(n+3){border-top:1px solid var(--rule)}
+  .specs .r{grid-template-columns:minmax(0,1fr);gap:2px}
+  .tiles{grid-template-columns:minmax(0,1fr)}
+  .focus .fk{display:none}
+}
+@media (prefers-reduced-motion:reduce){.mv-fig .bal{animation:none}.passport,.dissolve,.focus{transition:none}}
 .veil{position:fixed;inset:0;background:var(--night);transition:opacity 1s;pointer-events:none}
 </style>
 
 <div id="stage"></div>
 <header class="plate"><h1>Maoz Dayan</h1><span class="rule" aria-hidden="true"></span><span class="sc">Private Collection</span></header>
 <nav class="bar" dir="rtl"><button class="primary" id="b-lid">פתיחת המכסה</button><button id="b-reset">איפוס מבט</button></nav>
+<div class="focus" id="focus" hidden aria-live="polite"><span class="fk" id="focus-k"></span><span class="fn" id="focus-n"></span><button id="focus-open">View watch</button></div>
+<div class="dissolve" id="dissolve" hidden></div>
+<article class="passport" id="passport" hidden aria-label="Watch passport">
+  <div class="pp-top"><button id="pp-back">← The box</button><div class="seg" role="group" aria-label="View as"><button data-viewer="owner" aria-pressed="true">Owner</button><button data-viewer="visitor">Visitor</button></div></div>
+  <div class="pp-hero"><canvas id="hero-canvas"></canvas><div class="hero-views"><button data-hero="dial">Dial</button><button data-hero="three" aria-pressed="true">Three-quarter</button><button data-hero="profile">Profile</button></div></div>
+  <p class="demo-note" id="demo-note">Demo collection · ownership details are examples</p>
+  <div class="pp-body" id="pp-body"></div>
+</article>
 <div class="veil" id="veil"></div>
 
 <script type="importmap">
@@ -84,20 +198,94 @@ const CUSH_Y = LIN_TOP + CUSH_R;
 const STRAP_OFF = 0.13, STRAP_W = 2.0, STRAP_T = 0.26;
 const WATCH_TILT = 0.3; // watches sit slightly forward on the roll, facing the viewer
 
-const WATCHES = [
-  {k:"Diver", metal:"steel", dial:{base:"#0b0c0e", style:"dots", lume:"#f2efe2", ind:"#d9dde2"}, bezel:{kind:"diver", a:"#0d0e10", b:"#0d0e10", ink:"#d8d8d0"}, band:"bracelet"},
-  {k:"Dress", metal:"gold", dial:{base:"#efe6d2", style:"roman", ind:"#8a6a2e"}, band:"leather", strap:"#4a2a17"},
-  {k:"Chronograph", metal:"steel", dial:{base:"#ecebe6", style:"baton", ind:"#9aa0a8", sub:"#111214", subInk:"#e8e6df"}, bezel:{kind:"tachy", a:"#121315", b:"#121315", ink:"#e9e7e0"}, band:"bracelet"},
-  {k:"Sports", metal:"steel", dial:{base:"#123a7a", base2:"#08214b", sun:true, style:"baton", ind:"#e6e9ee"}, band:"bracelet", date:true},
+/* =====================================================================
+   WATCH DATA — two layers, kept apart on purpose.
+   CATALOGUE: model-level facts for a reference (brand, specs, movement, story).
+     Later filled automatically by photo identification: Photo → Brand → Model → Reference → Variant.
+     A null value means "unknown": the page says so instead of guessing.
+   COLLECTION: this collector's physical watches. Only what is unique to the watch lives here,
+     plus a `look` that drives the 3D model (including its real hand configuration).
+   `private` holds owner-only data; the visitor projection never includes it.
+   ===================================================================== */
+const CATALOGUE = {
+  "rolex-submariner-124060": {
+    brand:"Rolex", collection:"Submariner", model:"Submariner", reference:"124060", variant:"No Date · black dial", introduced:2020,
+    case:{ material:"Oystersteel", diameterMm:41, thicknessMm:null, crystal:"Sapphire", waterResistance:"300 m", bezel:"Unidirectional rotatable, black Cerachrom insert" },
+    dial:"Black, Chromalight luminescent markers",
+    band:"Oyster bracelet, Oysterlock folding clasp with Glidelock extension",
+    functions:["Hours", "Minutes", "Central seconds"],
+    movement:{ calibre:"3230", manufacturer:"Rolex", winding:"Automatic", powerReserveHours:70, frequencyVph:28800, jewels:31, complications:[] },
+    story:{
+      lede:"The reference point for every dive watch that followed.",
+      history:"Rolex introduced the Submariner in 1953 as a tool for professional divers: a waterproof Oyster case, a rotating bezel to time a dive, and markers legible in the dark. Reference 124060, launched in 2020, is the current no-date version with a 41 mm case.",
+      significance:"Few watches have defined a category so completely. The rotating timing bezel, the luminous geometric markers and the robust bracelet became the vocabulary of the modern dive watch.",
+      design:"The no-date dial is the purest expression of the original layout: no cyclops, no date window, a symmetrical dial with triangle, circle and baton markers.",
+      notable:["41 mm Oystersteel case", "Calibre 3230 with Chronergy escapement", "Glidelock extension adjustable without tools"]
+    },
+    retailPrice:null,
+    source:"Écrin reference catalogue"
+  },
+  "rolex-daytona-116500ln": {
+    brand:"Rolex", collection:"Cosmograph Daytona", model:"Cosmograph Daytona", reference:"116500LN", variant:"White dial", introduced:2016,
+    case:{ material:"Oystersteel", diameterMm:40, thicknessMm:null, crystal:"Sapphire", waterResistance:"100 m", bezel:"Black Cerachrom with engraved tachymetric scale" },
+    dial:"White with black counters",
+    band:"Oyster bracelet, Oysterlock folding clasp",
+    functions:["Hours", "Minutes", "Small seconds at 9 o'clock", "Chronograph: central seconds, 30-minute counter at 3, 12-hour counter at 6"],
+    movement:{ calibre:"4130", manufacturer:"Rolex", winding:"Automatic", powerReserveHours:72, frequencyVph:28800, jewels:44, complications:["Chronograph"] },
+    story:{
+      lede:"A racing chronograph that became the most sought-after steel watch of its era.",
+      history:"The Cosmograph Daytona was introduced in 1963 for racing drivers, named after the beach in Florida where land speed records were set. Its tachymetric bezel converts elapsed time into average speed. Reference 116500LN, introduced in 2016, brought a black Cerachrom bezel to the steel Daytona.",
+      significance:"The Daytona is the archetype of the luxury sports chronograph, and the steel model has been among the most desired watches in the world for decades.",
+      design:"Three counters in contrasting black on a white dial, with the tachymetric scale moved from the dial to the bezel, give the watch its graphic, legible face.",
+      notable:["Calibre 4130, the in-house Daytona chronograph movement introduced in 2000", "Cerachrom ceramic bezel", "Screw-down chronograph pushers"]
+    },
+    retailPrice:null,
+    source:"Écrin reference catalogue"
+  }
+};
+
+const COLLECTION = [
+  { id:"w-0001", slot:0, catalogueId:"rolex-submariner-124060", identification:{ status:"identified", method:"manual" },
+    look:{ metal:"steel", dial:{base:"#0b0c0e", style:"dots", lume:"#f2efe2", ind:"#d9dde2"}, bezel:{kind:"diver", a:"#0d0e10", b:"#0d0e10", ink:"#d8d8d0"}, band:"bracelet", lumeHands:true,
+           hands:{ central:["h", "m", "s"] } },
+    owned:{ status:"owned", year:2021, acquisition:"purchase", startedOn:"2021-03-14", condition:"Excellent", box:true, papers:true, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:"2021-03-14", price:{ amount:9850, currency:"EUR" }, source:"Authorised dealer", notes:"", documents:[] } },
+  { id:"w-0002", slot:1, catalogueId:null, identification:{ status:"unidentified" }, described:{ label:"Dress watch", detail:"Yellow gold case, ivory dial with Roman numerals, brown leather strap" },
+    look:{ metal:"gold", dial:{base:"#efe6d2", style:"roman", ind:"#8a6a2e"}, band:"leather", strap:"#4a2a17", hands:{ central:["h", "m", "s"] } },
+    owned:{ status:"owned", year:null, acquisition:"inheritance", startedOn:"2016-09-01", condition:"Very good", box:false, papers:false, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } },
+  { id:"w-0003", slot:2, catalogueId:"rolex-daytona-116500ln", identification:{ status:"identified", method:"manual" },
+    look:{ metal:"steel", dial:{base:"#ecebe6", style:"baton", ind:"#9aa0a8", sub:"#111214", subInk:"#e8e6df"}, bezel:{kind:"tachy", a:"#121315", b:"#121315", ink:"#e9e7e0"}, band:"bracelet",
+           hands:{ central:["h", "m", "chrono"], subs:[{ at:9, kind:"seconds" }, { at:3, kind:"chronoMinutes" }, { at:6, kind:"chronoHours" }] } },
+    owned:{ status:"owned", year:2019, acquisition:"gift", startedOn:"2019-06-02", condition:"Excellent", box:true, papers:true, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } },
+  { id:"w-0004", slot:3, catalogueId:null, identification:{ status:"unidentified" }, described:{ label:"Sports watch", detail:"Steel case and bracelet, blue sunburst dial with date at 3" },
+    look:{ metal:"steel", dial:{base:"#123a7a", base2:"#08214b", sun:true, style:"baton", ind:"#e6e9ee"}, band:"bracelet", date:true, hands:{ central:["h", "m", "s"] } },
+    owned:{ status:"owned", year:null, acquisition:"purchase", startedOn:"2023-11-20", condition:"Excellent", box:true, papers:false, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:"2023-11-20", price:null, source:null, notes:"", documents:[] } },
   null,
-  {k:"Pilot", metal:"steel", dial:{base:"#141414", style:"arabic", ind:"#f0ede4"}, band:"leather", strap:"#6b4528"},
-  {k:"GMT", metal:"steel", dial:{base:"#0c0d10", style:"dots", lume:"#f2efe2", ind:"#d9dde2"}, bezel:{kind:"gmt", a:"#8e1b22", b:"#1c2f6b", ink:"#ecebe4"}, band:"bracelet", date:true},
-  {k:"Dress", metal:"rose", dial:{base:"#e8b8a0", base2:"#d79d83", sun:true, style:"baton", ind:"#8c5a44"}, band:"leather", strap:"#16120f"},
-  {k:"Diver", metal:"steel", dial:{base:"#0f3b26", base2:"#082416", sun:true, style:"dots", lume:"#eef0dc", ind:"#d9dde2"}, bezel:{kind:"diver", a:"#0e3a24", b:"#0e3a24", ink:"#d9dbc8"}, band:"bracelet", date:true},
-  {k:"Field", metal:"steel", dial:{base:"#e7e1cf", style:"arabic", ind:"#202020"}, band:"leather", strap:"#3a3f2c"},
-  {k:"Sports", metal:"steel", dial:{base:"#4b5056", base2:"#33373c", sun:true, style:"baton", ind:"#eef0f2"}, band:"bracelet"},
-  {k:"Diver", metal:"gold", dial:{base:"#0b0b0c", style:"dots", lume:"#f2efe2", ind:"#e2bf72"}, bezel:{kind:"diver", a:"#0d0d0f", b:"#0d0d0f", ink:"#e6c98a"}, band:"bracelet"}
+  { id:"w-0006", slot:5, catalogueId:null, identification:{ status:"unidentified" }, described:{ label:"Pilot's watch", detail:"Steel case, matte black dial with Arabic numerals, brown leather strap" },
+    look:{ metal:"steel", dial:{base:"#141414", style:"arabic", ind:"#f0ede4"}, band:"leather", strap:"#6b4528", hands:{ central:["h", "m", "s"] } },
+    owned:{ status:"owned", year:null, acquisition:"purchase", startedOn:"2018-04-07", condition:"Good", box:false, papers:false, story:"", service:[], provenance:[], documents:[] },
+    private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } },
+  // further slots for the 8- and 12-watch layouts: unidentified looks only
+  ...[
+    { metal:"steel", dial:{base:"#0c0d10", style:"dots", lume:"#f2efe2", ind:"#d9dde2"}, bezel:{kind:"gmt", a:"#8e1b22", b:"#1c2f6b", ink:"#ecebe4"}, band:"bracelet", date:true, lumeHands:true, hands:{ central:["h", "m", "s"], gmt:true }, label:"GMT watch" },
+    { metal:"rose", dial:{base:"#e8b8a0", base2:"#d79d83", sun:true, style:"baton", ind:"#8c5a44"}, band:"leather", strap:"#16120f", hands:{ central:["h", "m", "s"] }, label:"Dress watch" },
+    { metal:"steel", dial:{base:"#0f3b26", base2:"#082416", sun:true, style:"dots", lume:"#eef0dc", ind:"#d9dde2"}, bezel:{kind:"diver", a:"#0e3a24", b:"#0e3a24", ink:"#d9dbc8"}, band:"bracelet", date:true, lumeHands:true, hands:{ central:["h", "m", "s"] }, label:"Dive watch" },
+    { metal:"steel", dial:{base:"#e7e1cf", style:"arabic", ind:"#202020"}, band:"leather", strap:"#3a3f2c", hands:{ central:["h", "m", "s"] }, label:"Field watch" },
+    { metal:"steel", dial:{base:"#4b5056", base2:"#33373c", sun:true, style:"baton", ind:"#eef0f2"}, band:"bracelet", hands:{ central:["h", "m", "s"] }, label:"Sports watch" },
+    { metal:"gold", dial:{base:"#0b0b0c", style:"dots", lume:"#f2efe2", ind:"#e2bf72"}, bezel:{kind:"diver", a:"#0d0d0f", b:"#0d0d0f", ink:"#e6c98a"}, band:"bracelet", lumeHands:true, hands:{ central:["h", "m", "s"] }, label:"Dive watch" }
+  ].map((look, i) => ({ id:`w-${String(i + 7).padStart(4, "0")}`, slot:i + 6, catalogueId:null, identification:{ status:"unidentified" }, described:{ label:look.label, detail:"" }, look,
+      owned:{ status:"owned", year:null, acquisition:null, startedOn:null, condition:null, box:null, papers:null, story:"", service:[], provenance:[], documents:[] },
+      private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } }))
 ];
+const entryAt = slot => COLLECTION.find(e => e && e.slot === slot) || null;
+// What a visitor may see: model-level facts plus the public parts of this watch. Never `private`.
+function publicProjection(e){
+  const { private:_omit, ...rest } = e;
+  return { ...rest, owned:{ status:e.owned.status, year:e.owned.year, startedOn:e.owned.startedOn, acquisition:e.owned.acquisition, condition:e.owned.condition, box:e.owned.box, papers:e.owned.papers, story:e.owned.story, service:e.owned.service, provenance:e.owned.provenance, documents:[] } };
+}
 
 /* ============ renderer, scene, camera ============ */
 const stage = document.getElementById("stage");
@@ -117,7 +305,7 @@ const maxAniso = renderer.capabilities.getMaxAnisotropy();
 const scene = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
 // Warm interior room with large soft windows: gentle, even reflections rather than hard studio streaks.
-function softRoom(){
+function softRoom(pm = pmrem){
   const s = new THREE.Scene();
   s.add(new THREE.Mesh(new THREE.BoxGeometry(100, 60, 100), new THREE.MeshBasicMaterial({ color:0x2a221b, side:THREE.BackSide })));
   const panel = (w, h, pos, k, col) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color:new THREE.Color(col).multiplyScalar(k), side:THREE.DoubleSide })); m.position.set(...pos); m.lookAt(0, 0, 0); s.add(m); };
@@ -127,7 +315,7 @@ function softRoom(){
   panel(60, 14, [0, 4, 49], 0.7, 0xffe7c8);     // front bounce
   panel(60, 10, [0, 4, -49], 0.5, 0xffd9b0);    // back
   const fl = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color:0x3a2c20 })); fl.rotation.x = -Math.PI / 2; fl.position.y = -29; s.add(fl);
-  return pmrem.fromScene(s, 0.03).texture;
+  return pm.fromScene(s, 0.03).texture;
 }
 scene.environment = softRoom();
 scene.environmentIntensity = 0.85;
@@ -219,13 +407,12 @@ function dialCanvas(o, date){
       g.beginPath(); g.arc(x, y, R * 0.2, 0, Math.PI * 2); g.fillStyle = o.sub; g.fill();
       g.strokeStyle = shade(o.ind, 0.2); g.lineWidth = 5; g.stroke();
       for (let i = 0; i < 12; i++){ const a = i * Math.PI / 6; g.fillStyle = o.subInk; g.fillRect(x + Math.sin(a) * R * 0.15 - 2, y - Math.cos(a) * R * 0.15 - 2, 4, 4); }
-      g.save(); g.translate(x, y); g.rotate(0.8 + x * 0.002); g.fillStyle = o.subInk; g.fillRect(-3, -R * 0.16, 6, R * 0.18); g.restore();
     }
   }
   if (date){
     g.fillStyle = "#f4f2ea"; g.fillRect(R * 0.58, -R * 0.075, R * 0.18, R * 0.15);
     g.strokeStyle = shade(o.ind, -0.2); g.lineWidth = 5; g.strokeRect(R * 0.58, -R * 0.075, R * 0.18, R * 0.15);
-    g.fillStyle = "#111"; g.font = `500 ${R * 0.11}px "Jost", sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("6", R * 0.67, R * 0.005);
+    g.fillStyle = "#111"; g.font = `500 ${R * 0.11}px "Jost", sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(String(date), R * 0.67, R * 0.005);
   }
   g.fillStyle = lightDial ? "rgba(25,25,25,0.8)" : "rgba(235,232,224,0.82)";
   g.font = `400 ${R * 0.05}px "Jost", sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
@@ -313,7 +500,7 @@ function braceletCanvases(){
   g.fillStyle = "#ffffff"; g.fillRect(W * 0.33, 0, W * 0.34, H);
   g.fillStyle = "#2a2a2a"; g.fillRect(0, 0, W, 3); g.fillRect(W * 0.33 - 2, 0, 3, H); g.fillRect(W * 0.67 - 1, 0, 3, H);
   g.fillStyle = "#4a4a4a"; g.fillRect(0, 3, W, 2);
-  r.fillStyle = "rgb(0,90,0)"; r.fillRect(0, 0, W, H); r.fillStyle = "rgb(0,26,0)"; r.fillRect(W * 0.33, 0, W * 0.34, H); r.fillStyle = "rgb(0,200,0)"; r.fillRect(0, 0, W, 4);
+  r.fillStyle = "rgb(0,125,0)"; r.fillRect(0, 0, W, H); r.fillStyle = "rgb(0,85,0)"; r.fillRect(W * 0.33, 0, W * 0.34, H); r.fillStyle = "rgb(0,200,0)"; r.fillRect(0, 0, W, 4);
   return { col, rough };
 }
 function leatherCanvas(hex){
@@ -326,33 +513,71 @@ function leatherCanvas(hex){
   for (let y = 0; y < H; y += 32){ g.fillRect(W * 0.085, y + 6, 5, 18); g.fillRect(W * 0.915 - 5, y + 6, 5, 18); }
   return c;
 }
+/* ============ watch renderer ============
+   look.hands describes the real hand set of the model:
+     central: any of "h", "m", "s" (running seconds), "chrono" (chronograph seconds, at rest at 12)
+     subs:    [{ at: 3|6|9|12, kind: "seconds" | "chronoMinutes" | "chronoHours" }]
+     gmt:     24-hour hand (shows local time until a second zone is set)
+   Further kinds (moonphase, power reserve…) plug into the same registry. Nothing is drawn that the model lacks. */
+const SUB_POS = { 3:[0.689, 0], 6:[0, 0.689], 9:[-0.689, 0], 12:[0, -0.689] };
+const liveWatches = new Set();   // hand sets currently on screen, updated by the ticker
+const dateDials = [];            // dial materials whose date window must follow the calendar
 function buildWatch(w){
   const head = new THREE.Group();
   const [polished, brushed] = metalOf(w.metal);
-  const add = (geo, mat, cast = true) => { const m = new THREE.Mesh(geo, mat); m.castShadow = cast; m.receiveShadow = true; head.add(m); return m; };
+  const add = (geo, mat, cast = true, parent = head) => { const m = new THREE.Mesh(geo, mat); m.castShadow = cast; m.receiveShadow = true; parent.add(m); return m; };
   add(GEO.case, brushed);
   if (w.bezel){
     add(GEO.bezelDiver, polished);
     const bt = tex(bezelCanvas(w.bezel)); const ring = add(GEO.bezelRing, new THREE.MeshPhysicalMaterial({ map:bt, roughness:0.16, specularIntensity:0.7 }), false); ring.position.y = 1.125;
   } else add(GEO.bezelPlain, polished);
-  const dKey = JSON.stringify(w.dial) + !!w.date;
-  if (!dialCache.has(dKey)) dialCache.set(dKey, tex(dialCanvas(w.dial, w.date)));
-  const dial = add(GEO.dial, new THREE.MeshPhysicalMaterial({ map:dialCache.get(dKey), roughness:w.dial.sun ? 0.22 : 0.26, metalness:w.dial.sun ? 0.35 : 0, specularIntensity:0.6 }), false);
-  dial.position.y = 0.9;
+  const day = new Date().getDate();
+  const dKey = JSON.stringify(w.dial) + (w.date ? day : 0);
+  if (!dialCache.has(dKey)) dialCache.set(dKey, tex(dialCanvas(w.dial, w.date ? day : 0)));
+  const dialMat = new THREE.MeshPhysicalMaterial({ map:dialCache.get(dKey), roughness:w.dial.sun ? 0.22 : 0.26, metalness:w.dial.sun ? 0.35 : 0, specularIntensity:0.6 });
+  if (w.date) dateDials.push({ mat:dialMat, look:w });
+  const dial = add(GEO.dial, dialMat, false); dial.position.y = 0.9;
   const reh = add(GEO.rehaut, brushed, false); reh.position.y = 0.99;
   const handMat = w.metal === "steel" ? M.steel : polished;
-  const lumeHands = w.dial.style === "dots";
-  const hh = add(GEO.hourHand, handMat); hh.position.y = 0.95; hh.rotation.y = -HAND_ANGLES.h;
-  const mh = add(GEO.minHand, handMat); mh.position.y = 0.985; mh.rotation.y = -HAND_ANGLES.m;
-  if (lumeHands){ const hl = add(GEO.hourLume, M.lume, false); hl.position.y = 0.97; hl.rotation.y = -HAND_ANGLES.h; const ml = add(GEO.minLume, M.lume, false); ml.position.y = 1.005; ml.rotation.y = -HAND_ANGLES.m; }
-  const sh = add(GEO.secHand, w.k === "GMT" || w.k === "Diver" ? M.red : handMat); sh.position.y = 1.02; sh.rotation.y = -HAND_ANGLES.s;
-  const hub = add(GEO.hub, handMat); hub.position.y = 1.0;
-  const cr = add(GEO.crystal, M.crystal, false); cr.position.y = 1.13; cr.renderOrder = 2;
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]){
-    const lug = add(GEO.lug, brushed); lug.position.set(sx * 1.2, 0.36, sz * 1.95); lug.rotation.x = sz * 0.6;
+  const cfg = w.hands || { central:["h", "m", "s"] };
+  const set = { h:[], m:[], s:[], chrono:[], subs:[], gmt:[] };
+  // each hand is a pivot group so lume plates and tips turn with it
+  const pivot = (y, x = 0, z = 0) => { const p = new THREE.Group(); p.position.set(x, y, z); head.add(p); return p; };
+  if (cfg.central.includes("h")){ const p = pivot(0.95); add(GEO.hourHand, handMat, true, p); if (w.lumeHands){ const l = add(GEO.hourLume, M.lume, false, p); l.position.y = 0.02; } set.h.push(p); }
+  if (cfg.central.includes("m")){ const p = pivot(0.985); add(GEO.minHand, handMat, true, p); if (w.lumeHands){ const l = add(GEO.minLume, M.lume, false, p); l.position.y = 0.02; } set.m.push(p); }
+  if (cfg.gmt){ const p = pivot(1.0); add(GEO.gmtHand, M.red, true, p); set.gmt.push(p); }
+  if (cfg.central.includes("s")){ const p = pivot(1.025); add(GEO.secHand, handMat, true, p); set.s.push(p); }
+  if (cfg.central.includes("chrono")){ const p = pivot(1.025); add(GEO.secHand, handMat, true, p); set.chrono.push(p); }
+  for (const sub of cfg.subs || []){
+    const [x, z] = SUB_POS[sub.at]; const p = pivot(0.93, x, z);
+    add(GEO.subHand, new THREE.MeshStandardMaterial({ color:w.dial.subInk || "#e8e6df", roughness:0.4 }), false, p);
+    const cap = add(GEO.subHub, handMat, false, p); cap.position.y = 0.01;
+    set.subs.push({ pivot:p, kind:sub.kind });
   }
-  const crown = add(GEO.crown, polished); crown.position.set(2.18, 0.5, 0);
+  add(GEO.hub, handMat).position.y = 1.03;
+  const cr = add(GEO.crystal, M.crystal, false); cr.position.y = 1.13; cr.renderOrder = 2;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]){ const lug = add(GEO.lug, brushed); lug.position.set(sx * 1.24, 0.5, sz * 1.8); lug.rotation.x = sz * 0.3; }
+  add(GEO.crown, polished).position.set(2.18, 0.5, 0);
+  head.userData.hands = set;
+  setHands(set, new Date());
   return head;
+}
+// Local time → hand angles. The hour hand moves continuously with the minutes; seconds advance in
+// eight steps a second, like a 28,800 vph movement, rather than sweeping like a quartz motor.
+function setHands(set, now){
+  const ms = now.getMilliseconds(), s = now.getSeconds() + Math.floor(ms / 125) / 8, m = now.getMinutes() + s / 60, h = now.getHours() % 12 + m / 60;
+  const turn = (list, frac) => list.forEach(p => { p.rotation.y = -frac * Math.PI * 2; });
+  turn(set.h, h / 12); turn(set.m, m / 60); turn(set.s, s / 60); turn(set.chrono, 0);
+  turn(set.gmt, (now.getHours() + m / 60) / 24);
+  for (const sub of set.subs) sub.pivot.rotation.y = sub.kind === "seconds" ? -(s / 60) * Math.PI * 2 : 0; // chronograph counters rest at zero
+}
+let lastTick = 0, lastDay = new Date().getDate();
+function tickHands(now){
+  if (now - lastTick < 125) return false;
+  lastTick = now; const d = new Date();
+  if (d.getDate() !== lastDay){ lastDay = d.getDate(); for (const dd of dateDials){ dd.mat.map = tex(dialCanvas(dd.look.dial, lastDay)); dd.mat.needsUpdate = true; } }
+  for (const set of liveWatches) setHands(set, d);
+  return liveWatches.size > 0;
 }
 
 
@@ -521,14 +746,15 @@ function sharedGeometries(){
   GEO.dial = new THREE.CircleGeometry(1.64, 72); GEO.dial.rotateX(-Math.PI / 2);
   GEO.crystal = new THREE.CircleGeometry(1.7, 72); GEO.crystal.rotateX(-Math.PI / 2);
   GEO.rehaut = new THREE.CylinderGeometry(1.66, 1.64, 0.2, 72, 1, true);
-  GEO.lug = new RoundedBoxGeometry(0.42, 0.4, 0.95, 3, 0.13);
+  GEO.lug = new RoundedBoxGeometry(0.5, 0.62, 1.05, 3, 0.08);
   GEO.crown = new THREE.CylinderGeometry(0.3, 0.3, 0.42, 28); GEO.crown.rotateZ(Math.PI / 2);
   GEO.hub = new THREE.CylinderGeometry(0.1, 0.1, 0.12, 20);
   const hand = (w, len, tail) => { const h = new THREE.BoxGeometry(w, 0.035, len + tail); h.translate(0, 0, -(len - tail) / 2); return h; };
   GEO.hourHand = hand(0.17, 0.95, 0.18); GEO.minHand = hand(0.12, 1.42, 0.2); GEO.secHand = hand(0.035, 1.5, 0.4);
   GEO.hourLume = hand(0.09, 0.7, 0); GEO.minLume = hand(0.06, 1.15, 0);
+  GEO.gmtHand = hand(0.05, 1.42, 0.1);
+  GEO.subHand = hand(0.035, 0.27, 0.07); GEO.subHub = new THREE.CylinderGeometry(0.045, 0.045, 0.05, 16);
 }
-const HAND_ANGLES = { h: (10 + 9 / 60) / 12 * Math.PI * 2, m: 9 / 60 * Math.PI * 2, s: 36 / 60 * Math.PI * 2 };
 const dialCache = new Map();
 const bandMats = {};
 function buildBand(w){
@@ -543,12 +769,14 @@ function buildBand(w){
 }
 
 /* ============ the box ============ */
+const boxHandSets = [];
 let box = null, lid = null, lidPane = null, plaqueMesh = null, cells = [];
 const state = { open:false, focus:null };
 const OPEN_ANGLE = THREE.MathUtils.degToRad(-106);
 function buildBox(){
   if (box){ scene.remove(box); box.traverse(o => { if (o.isMesh && !Object.values(GEO).includes(o.geometry)) o.geometry.dispose(); }); }
   cells = [];
+  for (const c of boxHandSets) liveWatches.delete(c); boxHandSets.length = 0; dateDials.length = 0;
   const L = OPTIONS.layouts[CONFIG.layout];
   const IW = L.cols * CELL_W + (L.cols - 1) * DIV_T, ID = L.rows * CELL_D + (L.rows - 1) * DIV_T;
   const OW = IW + 2 * WALL, OD = ID + 2 * WALL;
@@ -578,13 +806,13 @@ function buildBox(){
     const cushion = new THREE.Group(); cell.add(cushion);
     mesh(GEO.cushionBody, M.interior, cushion);
     for (const s of [-1, 1]){ const cap = mesh(GEO.cushionCap, M.interior, cushion); cap.position.x = s * CUSH_LEN / 2; if (s < 0) cap.rotation.y = Math.PI; const st = mesh(GEO.stitch, M.stitch, cushion); st.position.x = s * CUSH_LEN / 2; st.castShadow = false; }
-    const w = WATCHES[i];
+    const entry = entryAt(i), w = entry ? entry.look : null; let head = null;
     if (w){
       const worn = new THREE.Group(); worn.rotation.x = WATCH_TILT; cushion.add(worn);
       worn.add(buildBand(w));
-      const head = buildWatch(w); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
+      head = buildWatch(w); liveWatches.add(head.userData.hands); boxHandSets.push(head.userData.hands); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
     }
-    cell.userData = { slot:i, watch:w, cushion };
+    cell.userData = { slot:i, watch:w, entry, head, cushion };
     box.add(cell); cells.push(cell);
   }
   // front hardware: clasp, keyhole, plaque
@@ -647,20 +875,202 @@ function setOpen(open){
   tween(open ? 2.6 : 1.8, open ? lidEase : easeInOut, k => { lid.rotation.x = a0 + (a1 - a0) * k; });
   frameView(true, open ? 2.6 : 1.8);
 }
+/* ============ watch focus: presented to the collector ============ */
+const focusPill = document.getElementById("focus");
+function titleOf(e){
+  const c = e.catalogueId && CATALOGUE[e.catalogueId];
+  return c ? { kicker:c.brand, name:c.model } : { kicker:"Awaiting identification", name:e.described?.label || "Watch" };
+}
 function focusCell(cell){
-  if (state.focus === cell) return unfocus();
+  if (state.focus === cell) return openPassport(cell);
   if (state.focus) unfocus(true);
   state.focus = cell; const cu = cell.userData.cushion;
-  tween(0.9, easeInOut, k => { cu.position.y = 2.4 * k; cu.rotation.x = 0.28 * k; });
-  const world = new THREE.Vector3(); cell.getWorldPosition(world); world.y += 3;
-  flyTo(new THREE.Vector3().setFromSphericalCoords(fitDistance(16, 14), THREE.MathUtils.degToRad(46), THREE.MathUtils.degToRad(10)).add(world), world, 1.2);
+  // lift, then turn the dial toward the viewer, like a watch handed across a counter
+  tween(1.1, easeInOut, k => { cu.position.y = 2.6 * easeOut(Math.min(1, k * 1.3)); cu.rotation.x = 0.42 * k; });
+  const world = new THREE.Vector3(); cell.getWorldPosition(world); world.y += 3.4;
+  flyTo(new THREE.Vector3().setFromSphericalCoords(fitDistance(15, 13), THREE.MathUtils.degToRad(44), controls.getAzimuthalAngle() * 0.35).add(world), world, 1.3);
+  const t = titleOf(cell.userData.entry);
+  document.getElementById("focus-k").textContent = t.kicker; document.getElementById("focus-n").textContent = t.name;
+  focusPill.hidden = false; requestAnimationFrame(() => focusPill.classList.add("on"));
 }
 function unfocus(quiet){
   const cell = state.focus; if (!cell) return; state.focus = null;
+  focusPill.classList.remove("on"); setTimeout(() => { if (!state.focus) focusPill.hidden = true; }, 400);
   const cu = cell.userData.cushion, y0 = cu.position.y, r0 = cu.rotation.x;
   tween(0.8, easeInOut, k => { cu.position.y = y0 * (1 - k); cu.rotation.x = r0 * (1 - k); });
   if (!quiet) frameView(true, 1.1);
 }
+document.getElementById("focus-open").addEventListener("click", () => state.focus && openPassport(state.focus));
+
+/* ============ passport: transition ============ */
+const passport = document.getElementById("passport"), dissolve = document.getElementById("dissolve");
+let passportOpen = false, passportEntry = null, viewer = "owner", camBeforePassport = null;
+function openPassport(cell){
+  const entry = cell.userData.entry; if (!entry) return;
+  passportEntry = entry; camBeforePassport = { pos:camera.position.clone(), target:controls.target.clone() };
+  focusPill.classList.remove("on");
+  // move into the dial: the camera closes in on the watch while the room dims
+  const head = cell.userData.head, p = new THREE.Vector3(); head.getWorldPosition(p);
+  const n = new THREE.Vector3(0, 1, 0).applyQuaternion(head.getWorldQuaternion(new THREE.Quaternion()));
+  flyTo(p.clone().addScaledVector(n, 6.5), p, 0.9);
+  dissolve.hidden = false; requestAnimationFrame(() => dissolve.classList.add("on"));
+  setTimeout(() => {
+    renderPassport();
+    passport.hidden = false; passport.scrollTop = 0; passportOpen = true;
+    heroShow(entry, true);
+    requestAnimationFrame(() => { passport.classList.add("on"); dissolve.classList.remove("on"); });
+    setTimeout(() => { dissolve.hidden = true; }, 700);
+  }, 850);
+}
+function closePassport(){
+  passport.classList.remove("on");
+  setTimeout(() => { passport.hidden = true; passportOpen = false; heroHide(); }, 600);
+  if (camBeforePassport) flyTo(camBeforePassport.pos, camBeforePassport.target, 0.9);
+  if (state.focus){ focusPill.hidden = false; requestAnimationFrame(() => focusPill.classList.add("on")); }
+  requestRender();
+}
+
+/* ============ passport: hero (the same watch, in its own small stage) ============ */
+let hero = null;
+function ensureHero(){
+  if (hero) return hero;
+  const canvasEl = document.getElementById("hero-canvas");
+  const r = new THREE.WebGLRenderer({ canvas:canvasEl, antialias:true, alpha:true });
+  r.setPixelRatio(Math.min(devicePixelRatio, small ? 1.75 : 2)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping;
+  const pm = new THREE.PMREMGenerator(r);
+  const sc = new THREE.Scene(); sc.environment = softRoom(pm); sc.environmentIntensity = 0.95;
+  const k = new THREE.DirectionalLight(0xfff0dc, 1.5); k.position.set(18, 40, 30); sc.add(k);
+  const rm = new THREE.DirectionalLight(0xc8d6ff, 0.6); rm.position.set(-30, 10, -30); sc.add(rm);
+  const cam = new THREE.PerspectiveCamera(24, 1, 0.5, 200);
+  const ctl = new OrbitControls(cam, canvasEl); ctl.enableDamping = true; ctl.enablePan = false; ctl.minDistance = 7; ctl.maxDistance = 40;
+  ctl.autoRotate = !reduceMotion; ctl.autoRotateSpeed = 0.5;
+  ctl.addEventListener("start", () => { ctl.autoRotate = false; });
+  hero = { r, sc, cam, ctl, obj:null, set:null };
+  hero.size = () => { const b = canvasEl.parentElement.getBoundingClientRect(); if (!b.width) return; r.setSize(b.width, b.height, false); cam.aspect = b.width / Math.max(1, b.height); cam.updateProjectionMatrix(); };
+  new ResizeObserver(hero.size).observe(canvasEl.parentElement);
+  return hero;
+}
+const HERO_VIEWS = { dial:[16, 0], three:[52, 35], profile:[84, 90] };
+function heroView(name, dur = 1.2){
+  const h = hero, [pol, az] = HERO_VIEWS[name], t = new THREE.Vector3(0, 0.8, 0);
+  const s0 = new THREE.Spherical().setFromVector3(h.cam.position.clone().sub(h.ctl.target)), s1 = new THREE.Spherical(h.cam.aspect < 0.9 ? 27 : 18, THREE.MathUtils.degToRad(pol), THREE.MathUtils.degToRad(az));
+  h.ctl.autoRotate = false;
+  tween(dur, easeInOut, k => { h.ctl.target.lerp(t, k); h.cam.position.setFromSpherical(new THREE.Spherical(THREE.MathUtils.lerp(s0.radius, s1.radius, k), THREE.MathUtils.lerp(s0.phi, s1.phi, k), THREE.MathUtils.lerp(s0.theta, s1.theta, k))).add(h.ctl.target); });
+  document.querySelectorAll("[data-hero]").forEach(b => b.setAttribute("aria-pressed", b.dataset.hero === name));
+}
+function heroShow(entry, fromBox){
+  const h = ensureHero(); h.size();
+  if (h.obj){ h.sc.remove(h.obj); liveWatches.delete(h.set); }
+  // the watch as if on a wrist: its band closed in a loop, the head on top, presented dial-up
+  const g = new THREE.Group(); g.add(buildBand(entry.look));
+  const head = buildWatch(entry.look); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; g.add(head);
+  g.position.y = -(CUSH_R + STRAP_OFF) + 0.4; h.sc.add(g); h.obj = g; h.set = head.userData.hands; liveWatches.add(h.set);
+  h.ctl.target.set(0, 0.8, 0);
+  // continuity: start close on the dial (where the box camera ended) and ease back to the presentation view
+  h.cam.position.setFromSpherical(new THREE.Spherical(fromBox ? 7.5 : 18, THREE.MathUtils.degToRad(10), 0)).add(h.ctl.target);
+  h.ctl.autoRotate = false; heroView("three", fromBox ? 1.8 : 0.01);
+  setTimeout(() => { if (!reduceMotion) h.ctl.autoRotate = true; }, 2200);
+}
+function heroHide(){ if (hero && hero.set) liveWatches.delete(hero.set); }
+
+/* ============ passport: content ============ */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const ACQ_LABEL = { purchase:"Purchased", gift:"Received as a gift", inheritance:"Inherited", transfer:"Transferred", other:"Other" };
+const fmtDate = (d, opts = { day:"numeric", month:"long", year:"numeric" }) => d ? new Date(d + "T00:00:00").toLocaleDateString("en-GB", opts) : null;
+const fmtMoney = p => p && p.amount != null ? new Intl.NumberFormat("en-GB", { style:"currency", currency:p.currency, maximumFractionDigits:0 }).format(p.amount) : null;
+const UNKNOWN = `<span class="unk">Unknown</span>`, NOTREC = `<span class="unk">Not recorded</span>`;
+const v = (x, empty = UNKNOWN) => (x === null || x === undefined || x === "" || (Array.isArray(x) && !x.length)) ? empty : esc(x);
+const row = (k, val) => `<div class="r"><dt>${k}</dt><dd>${val}</dd></div>`;
+
+function movementSVG(mv){
+  if (!mv) return `<div class="mv-empty"><svg viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="170" class="ln dash"/><circle cx="200" cy="200" r="150" class="ln dash"/></svg><p>The movement drawing appears once the reference is identified.</p></div>`;
+  const auto = mv.winding === "Automatic", hz = mv.frequencyVph ? mv.frequencyVph / 7200 : 3, half = (1 / hz / 2).toFixed(3);
+  const jewel = (x, y) => `<circle cx="${x}" cy="${y}" r="3.2" class="jw"/>`;
+  const teeth = (cx, cy, r, n) => Array.from({ length:n }, (_, i) => { const a = i / n * Math.PI * 2; return `M${(cx + Math.cos(a) * r).toFixed(1)} ${(cy + Math.sin(a) * r).toFixed(1)}L${(cx + Math.cos(a) * (r + 5)).toFixed(1)} ${(cy + Math.sin(a) * (r + 5)).toFixed(1)}`; }).join("");
+  const spiral = Array.from({ length:120 }, (_, i) => { const t = i / 119 * Math.PI * 8, rr = 5 + t * 1.25; return `${i ? "L" : "M"}${(285 + Math.cos(t) * rr).toFixed(1)} ${(272 + Math.sin(t) * rr).toFixed(1)}`; }).join("");
+  return `<svg viewBox="0 0 400 400" role="img" aria-label="Schematic of a ${esc(mv.winding.toLowerCase())} movement">
+    <circle cx="200" cy="200" r="178" class="ln"/><circle cx="200" cy="200" r="170" class="ln thin"/>
+    <path class="br" d="M58 170 Q90 70 200 52 L238 120 Q180 150 168 210 L96 238 Z"/>
+    <path class="br" d="M182 226 L262 158 Q330 170 346 232 L300 236 Q262 214 236 246 Z"/>
+    <path class="br" d="M100 262 L174 246 L214 318 Q170 352 118 330 Z"/>
+    <circle cx="140" cy="150" r="58" class="ln"/><circle cx="140" cy="150" r="46" class="ln thin"/><path class="ln thin" d="${teeth(140, 150, 58, 60)}"/>
+    <circle cx="214" cy="190" r="26" class="ln"/><circle cx="246" cy="224" r="18" class="ln"/>
+    <g><circle cx="232" cy="268" r="17" class="ln"/><path class="ln thin" d="${teeth(232, 268, 17, 15)}"/></g>
+    <g class="bal" style="--half:${half}s"><circle cx="285" cy="272" r="54" class="ln heavy"/><circle cx="285" cy="272" r="48" class="ln thin"/>
+      <path class="ln" d="M231 272 H339 M285 218 V326"/><path class="ln hair" d="${spiral}"/></g>
+    ${auto ? `<path class="rotor" d="M44 200 A156 156 0 0 1 356 200 L300 200 A100 100 0 0 0 100 200 Z"/>` : ""}
+    ${[[140, 150], [214, 190], [246, 224], [232, 268], [285, 272], [176, 300], [118, 214]].map(([x, y]) => jewel(x, y)).join("")}
+    <g class="lbl"><path d="M140 150 L70 96"/><text x="66" y="90" text-anchor="end">Barrel</text>
+      <path d="M232 268 L196 352"/><text x="192" y="368" text-anchor="middle">Escape wheel</text>
+      <path d="M318 314 L340 350"/><text x="342" y="368" text-anchor="middle">Balance</text>
+      ${auto ? `<path d="M300 104 L346 64"/><text x="350" y="60">Rotor</text>` : ""}</g>
+  </svg>`;
+}
+
+function renderPassport(){
+  const raw = passportEntry, e = viewer === "owner" ? raw : publicProjection(raw);
+  const c = e.catalogueId ? CATALOGUE[e.catalogueId] : null, o = e.owned, p = viewer === "owner" ? raw.private : null;
+  const t = titleOf(e), mv = c?.movement || null;
+  const since = fmtDate(o.startedOn, { month:"long", year:"numeric" });
+  const hours = x => x == null ? UNKNOWN : `${x} hours`;
+  const vph = x => x == null ? UNKNOWN : `${x.toLocaleString("en-GB")} vph · ${(x / 7200).toLocaleString("en-GB")} Hz`;
+  const section = (id, label, title, body, note = "") => `<section class="sec" id="${id}"><header><span class="sc">${label}</span><h2>${title}</h2>${note ? `<p class="src">${note}</p>` : ""}</header><div class="body">${body}</div></section>`;
+  const srcNote = c ? `Source: ${esc(c.source)}` : `Awaiting identification`;
+  const identify = c ? "" : `<div class="ident"><p class="sc">Identification</p>
+      <ol class="pipe"><li>Photo</li><li>Brand</li><li>Model</li><li>Reference</li><li>Variant</li></ol>
+      <p>Once identified, the model, specifications, movement and history fill in here automatically. You only keep what is unique to your watch.</p>
+      <button class="ghost" disabled>Identify from a photo · coming soon</button></div>`;
+
+  document.getElementById("pp-body").innerHTML = `
+    <div class="hero-meta">
+      <p class="kick sc">${esc(t.kicker)}</p>
+      <h1>${esc(c ? c.model : t.name)}</h1>
+      ${c ? `<p class="variant">${esc(c.variant)}</p>` : `<p class="variant">${esc(e.described?.detail || "")}</p>`}
+      <dl class="strip">
+        ${row("Reference", c ? esc(c.reference) : UNKNOWN)}
+        ${row("Year", v(o.year))}
+        ${row("Status", o.status === "owned" ? "In the collection" : esc(o.status))}
+        ${row("In collection since", since ? esc(since) : NOTREC)}
+      </dl>
+    </div>
+    ${identify}
+    ${section("watch", "I", "The Watch", `<dl class="specs">
+        ${row("Case", v(c?.case.material))}${row("Diameter", c?.case.diameterMm ? `${c.case.diameterMm} mm` : UNKNOWN)}
+        ${row("Thickness", c?.case.thicknessMm ? `${c.case.thicknessMm} mm` : UNKNOWN)}${row("Crystal", v(c?.case.crystal))}
+        ${row("Water resistance", v(c?.case.waterResistance))}${row("Bezel", v(c?.case.bezel))}
+        ${row("Dial", v(c?.dial))}${row("Bracelet / strap", v(c?.band))}
+        ${row("Functions", c ? c.functions.map(esc).join("<br>") : UNKNOWN)}</dl>`, srcNote)}
+    ${section("movement", "II", "The Movement", `<div class="mv">
+        <figure class="mv-fig">${movementSVG(mv)}<figcaption>${mv ? "Schematic illustration of " + (/^[aeiou]/i.test(mv.winding) ? "an " : "a ") + esc(mv.winding.toLowerCase()) + " movement. The exact drawing of calibre " + esc(mv.calibre) + " will replace it." : ""}</figcaption></figure>
+        <dl class="specs">${row("Calibre", v(mv?.calibre))}${row("Manufacturer", v(mv?.manufacturer))}${row("Winding", v(mv?.winding))}
+          ${row("Power reserve", mv ? hours(mv.powerReserveHours) : UNKNOWN)}${row("Frequency", mv ? vph(mv.frequencyVph) : UNKNOWN)}
+          ${row("Jewels", v(mv?.jewels))}${row("Complications", mv ? (mv.complications.length ? mv.complications.map(esc).join(", ") : "None") : UNKNOWN)}</dl></div>`, srcNote)}
+    ${section("model", "III", "About the Model", c ? `<p class="lede">${esc(c.story.lede)}</p>
+        <div class="essay"><h3>History</h3><p>${esc(c.story.history)}</p><h3>Why it matters</h3><p>${esc(c.story.significance)}</p><h3>Design</h3><p>${esc(c.story.design)}</p></div>
+        <ul class="notable">${c.story.notable.map(n => `<li>${esc(n)}</li>`).join("")}</ul>`
+      : `<p class="empty">The story of the model appears here after identification.</p>`)}
+    ${section("this", "IV", "This Watch", `<dl class="specs">
+        ${row("How it came to you", o.acquisition ? esc(ACQ_LABEL[o.acquisition]) : NOTREC)}${row("In the collection since", fmtDate(o.startedOn) ? esc(fmtDate(o.startedOn)) : NOTREC)}
+        ${row("Condition", v(o.condition, NOTREC))}${row("Box and papers", o.box == null ? NOTREC : [o.box ? "Box" : "No box", o.papers ? "papers" : "no papers"].join(", "))}</dl>
+        <div class="story">${o.story ? `<p>${esc(o.story)}</p>` : `<p class="empty">${viewer === "owner" ? "Your story of this watch: where it came from, what it marks, why you keep it." : "The owner hasn't written a story for this watch yet."}</p>${viewer === "owner" ? `<button class="ghost" disabled>Write the story · coming soon</button>` : ""}`}</div>`)}
+    ${section("value", "V", "Value", `<div class="tiles"><div class="tile"><span class="sc">Estimated market value</span><b>Not yet estimated</b></div><div class="tile"><span class="sc">Retail price</span><b>${c?.retailPrice ? esc(fmtMoney(c.retailPrice)) : "Not available"}</b></div></div>
+        <figure class="chart"><svg viewBox="0 0 600 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 H600" class="ax"/><path d="M0 80 H600 M0 40 H600" class="grid"/></svg><figcaption>Value history will chart here once valuations begin.</figcaption></figure>`)}
+    ${section("history", "VI", "History", `<div class="hist">
+        <div><h3>Service history</h3>${o.service.length ? "" : `<p class="empty">No service recorded.</p>`}</div>
+        <div><h3>Provenance</h3><ol class="prov">${o.startedOn ? `<li><b>${esc(fmtDate(o.startedOn, { month:"short", year:"numeric" }))}</b> ${o.acquisition === "gift" ? "Received as a gift" : o.acquisition === "inheritance" ? "Inherited" : "Acquired"} by the current owner</li>` : ""}</ol>${o.startedOn ? "" : `<p class="empty">No provenance recorded.</p>`}</div>
+        <div><h3>Documents</h3><p class="empty">No documents attached.</p></div></div>`)}
+    ${p ? section("private", "", `<span class="lock">${LOCK_SVG}</span> Private`, `<p class="priv-note">Only you can see this. It never appears on your shared collection.</p><dl class="specs">
+        ${row("Serial number", v(p.serial, NOTREC))}${row("Purchase date", fmtDate(p.purchaseDate) ? esc(fmtDate(p.purchaseDate)) : (raw.owned.acquisition === "purchase" ? NOTREC : `<span class="unk">Not a purchase</span>`))}
+        ${row("Purchase price", fmtMoney(p.price) ? esc(fmtMoney(p.price)) : NOTREC)}${row("Purchased from", v(p.source, NOTREC))}
+        ${row("Private notes", v(p.notes, NOTREC))}${row("Private documents", p.documents.length ? p.documents.length + " files" : NOTREC)}</dl>`) : ""}
+    <footer class="colophon"><span>${esc(e.id.toUpperCase())}</span><span>Écrin · Digital passport</span></footer>`;
+  document.querySelectorAll("[data-viewer]").forEach(b => b.setAttribute("aria-pressed", b.dataset.viewer === viewer));
+  document.getElementById("demo-note").hidden = viewer !== "owner";
+}
+const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7.5" rx="1" fill="none" stroke="currentColor"/><path d="M3.2 6V4a2.8 2.8 0 0 1 5.6 0v2" fill="none" stroke="currentColor"/></svg>`;
+document.getElementById("pp-back").addEventListener("click", closePassport);
+document.querySelectorAll("[data-viewer]").forEach(b => b.addEventListener("click", () => { viewer = b.dataset.viewer; renderPassport(); }));
+document.querySelectorAll("[data-hero]").forEach(b => b.addEventListener("click", () => heroView(b.dataset.hero)));
 
 /* ============ picking ============ */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
@@ -682,14 +1092,16 @@ function requestRender(shadows = false){ dirty = true; if (shadows) renderer.sha
 controls.addEventListener("change", requestRender);
 function loop(now){
   requestAnimationFrame(loop);
-  if (tweens.length) renderer.shadowMap.needsUpdate = true;
+  const ticked = tickHands(now);
+  if (tweens.length && !passportOpen) renderer.shadowMap.needsUpdate = true;
   for (let i = tweens.length - 1; i >= 0; i--){ const tw = tweens[i], k = Math.min(1, (now - tw.t0) / tw.dur); tw.fn(tw.ease(k)); dirty = true; if (k >= 1) tweens.splice(i, 1); }
-  if (controls.update() || dirty){ renderer.render(scene, camera); dirty = false; }
+  if (passportOpen && hero){ hero.ctl.update(); hero.r.render(hero.sc, hero.cam); return; }
+  if (controls.update() || dirty || ticked){ renderer.render(scene, camera); dirty = false; }
 }
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!state.focus) frameView(false); requestRender(); });
 lidBtn.addEventListener("click", () => setOpen(!state.open));
 document.getElementById("b-reset").addEventListener("click", () => { if (state.focus) unfocus(true); frameView(true, 1.1); });
-addEventListener("keydown", e => { if (e.key === "Escape" && state.focus) unfocus(); });
+addEventListener("keydown", e => { if (e.key !== "Escape") return; if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
 
 /* ============ start ============ */
 async function start(){
@@ -700,7 +1112,7 @@ async function start(){
   requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
-  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, cells:() => cells, requestRender, M, scene, frameView };
+  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
 start();
 </script>
