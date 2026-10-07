@@ -76,8 +76,8 @@ const OPTIONS = {
 };
 
 /* Dimensions in centimetres, taken from the reference box (34 × 22 × 9.5 cm, 1.2 cm walls). */
-const CELL_W = 10.4, CELL_D = 9.8, WALL = 1.2, FLOOR = 1.4, BASE_H = 7.6, LID_H = 2.0, LID_RAIL = 2.0;
-const DIV_T = 0.45, DIV_H = 3.9, LINING_T = 0.35, FEET = 0.3;
+const CELL_W = 10.4, CELL_D = 9.8, WALL = 0.7, FLOOR = 0.9, BASE_H = 7.6, LID_H = 1.25, LID_RAIL = 1.1;
+const DIV_T = 0.45, DIV_H = 3.9, LINING_T = 0.35, FEET = 0.15;
 const CUSH_R = 2.3, CUSH_LEN = CELL_W * 0.6;
 const LIN_TOP = FEET + FLOOR + LINING_T;
 const CUSH_Y = LIN_TOP + CUSH_R;
@@ -136,7 +136,7 @@ const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 1, 800)
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08; controls.enablePan = false;
 controls.rotateSpeed = 0.55; controls.zoomSpeed = 0.7;
-controls.minPolarAngle = THREE.MathUtils.degToRad(4); controls.maxPolarAngle = THREE.MathUtils.degToRad(82);
+controls.minPolarAngle = 0; controls.maxPolarAngle = Math.PI;
 
 const key = new THREE.DirectionalLight(0xfff0dc, 1.7);
 key.position.set(28, 62, 42); key.castShadow = true;
@@ -146,6 +146,7 @@ key.shadow.radius = 7; key.shadow.blurSamples = 16; key.shadow.bias = -0.0006; k
 scene.add(key);
 const rim = new THREE.DirectionalLight(0xc8d6ff, 0.45); rim.position.set(-50, 30, -40); scene.add(rim);
 scene.add(new THREE.HemisphereLight(0xffe8cc, 0x1a1008, 0.35));
+const under = new THREE.DirectionalLight(0xf2e6d6, 0.6); under.position.set(10, -40, 20); scene.add(under); // soft bounce so the underside reads when the box is turned over
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.ShadowMaterial({ opacity:0.5 }));
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 
@@ -498,10 +499,10 @@ function shadeHex(hex, amt){ const [r, g, b] = hexRGB(hex); const f = v => Math.
 
 /* ============ geometry ============ */
 // A rectangular frame with a crisp, small edge radius (outer w×d, opening iw×id, height h).
-function frame(w, d, iw, id, h, bev = 0.12, corner = 0.35){
+function frame(w, d, iw, id, h, bev = 0.035, corner = 0.08){
   const shape = roundedRect(w - 2 * bev, d - 2 * bev, corner);
-  shape.holes.push(holeRect(iw + 2 * bev, id + 2 * bev, 0.08));
-  const geo = new THREE.ExtrudeGeometry(shape, { depth:h - 2 * bev, bevelEnabled:true, bevelThickness:bev, bevelSize:bev, bevelSegments:3, curveSegments:8 });
+  shape.holes.push(holeRect(iw + 2 * bev, id + 2 * bev, 0.03));
+  const geo = new THREE.ExtrudeGeometry(shape, { depth:h - 2 * bev, bevelEnabled:true, bevelThickness:bev, bevelSize:bev, bevelSegments:1, curveSegments:4 });
   geo.rotateX(-Math.PI / 2); geo.translate(0, bev, 0);
   return geo;
 }
@@ -555,10 +556,10 @@ function buildBox(){
   const mesh = (geo, mat, parent = box) => { const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
   // shell: thin walls on a floor slab, lifted on four small felt feet
   const shell = mesh(frame(OW, OD, IW, ID, BASE_H - FEET), M.exterior); shell.position.y = FEET;
-  const slab = mesh(new RoundedBoxGeometry(OW - 0.06, FLOOR, OD - 0.06, 2, 0.1), M.exteriorSmall); slab.position.y = FEET + FLOOR / 2;
-  for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]){ const f = mesh(new THREE.CylinderGeometry(1.0, 1.0, FEET, 24), M.feet); f.position.set(sx * (OW / 2 - 2), FEET / 2, sz * (OD / 2 - 2)); }
+  const slab = mesh(new RoundedBoxGeometry(OW - 0.02, FLOOR, OD - 0.02, 1, 0.03), M.exteriorSmall); slab.position.y = FEET + FLOOR / 2;
+  for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]){ const f = mesh(new THREE.BoxGeometry(2.2, FEET, 2.2), M.feet); f.position.set(sx * (OW / 2 - 2.2), FEET / 2, sz * (OD / 2 - 2.2)); }
   // thin metal inlay line near the base, as on the reference
-  const inlay = mesh(frame(OW + 0.06, OD + 0.06, OW - 0.4, OD - 0.4, 0.16, 0.03, 0.38), M.metal); inlay.position.y = FEET + 0.55;
+  const inlay = mesh(frame(OW + 0.02, OD + 0.02, OW - 0.3, OD - 0.3, 0.08, 0.01, 0.08), M.metal); inlay.position.y = FEET + 0.45;
   // upholstery: floor, inner walls, dividers
   floorAOTex = new THREE.CanvasTexture(floorAO(L.cols, L.rows, IW, ID));
   const fl = mesh(new THREE.PlaneGeometry(IW, ID), M.floor); fl.rotation.x = -Math.PI / 2; fl.position.y = LIN_TOP; fl.castShadow = false;
@@ -587,20 +588,20 @@ function buildBox(){
     box.add(cell); cells.push(cell);
   }
   // front hardware: clasp, keyhole, plaque
-  const clasp = mesh(new RoundedBoxGeometry(3.4, 1.6, 0.3, 2, 0.08), M.metal); clasp.position.set(0, BASE_H - 0.6, OD / 2 + 0.12);
-  const kh = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.4, 20), M.keyhole); kh.rotation.x = Math.PI / 2; kh.position.set(0, BASE_H - 0.55, OD / 2 + 0.2);
-  plaqueMesh = mesh(new RoundedBoxGeometry(5.2, 1.9, 0.14, 2, 0.05), [M.metal, M.metal, M.metal, M.metal, M.plaque, M.metal]);
-  plaqueMesh.position.set(0, FEET + BASE_H * 0.42, OD / 2 + 0.06);
+  const clasp = mesh(new RoundedBoxGeometry(3.0, 1.3, 0.16, 1, 0.025), M.metal); clasp.position.set(0, FEET + BASE_H - 0.75, OD / 2 + 0.08);
+  const kh = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.4, 20), M.keyhole); kh.rotation.x = Math.PI / 2; kh.position.set(0, FEET + BASE_H - 0.75, OD / 2 + 0.12); kh.scale.set(0.7, 0.5, 0.7);
+  plaqueMesh = mesh(new RoundedBoxGeometry(5.2, 1.9, 0.08, 1, 0.015), [M.metal, M.metal, M.metal, M.metal, M.plaque, M.metal]);
+  plaqueMesh.position.set(0, FEET + BASE_H * 0.42, OD / 2 + 0.04);
   // hinges: two slim barrels on the back edge
-  for (const sx of [-1, 1]){ const h = mesh(new THREE.CylinderGeometry(0.38, 0.38, 3.4, 24), M.metal); h.rotation.z = Math.PI / 2; h.position.set(sx * OW * 0.3, FEET + BASE_H, -OD / 2 - 0.12); }
+  for (const sx of [-1, 1]){ const h = mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.8, 24), M.metal); h.rotation.z = Math.PI / 2; h.position.set(sx * OW * 0.3, FEET + BASE_H, -OD / 2 - 0.05); }
   // lid: thin frame, pane, metal inner lip; hinged on the back edge
   lid = new THREE.Group(); lid.position.set(0, FEET + BASE_H, -OD / 2);
   const lb = new THREE.Group(); lb.position.z = OD / 2; lid.add(lb);
   const PW = OW - 2 * LID_RAIL, PD = OD - 2 * LID_RAIL;
   mesh(frame(OW, OD, PW, PD, LID_H), M.exterior, lb);
-  lidPane = mesh(new THREE.BoxGeometry(PW + 0.5, 0.25, PD + 0.5), M.glass, lb); lidPane.position.y = LID_H * 0.66; lidPane.renderOrder = 3;
-  const lip = mesh(frame(PW + 0.36, PD + 0.36, PW, PD, 0.12, 0.03, 0.1), M.metal, lb); lip.position.y = LID_H - 0.04;
-  const claspTop = mesh(new RoundedBoxGeometry(2.0, 1.0, 0.3, 2, 0.08), M.metal, lb); claspTop.position.set(0, LID_H * 0.45, OD / 2 + 0.12);
+  lidPane = mesh(new THREE.BoxGeometry(PW + 0.4, 0.14, PD + 0.4), M.glass, lb); lidPane.position.y = LID_H * 0.6; lidPane.renderOrder = 3;
+  const lip = mesh(frame(PW + 0.2, PD + 0.2, PW, PD, 0.06, 0.01, 0.03), M.metal, lb); lip.position.y = LID_H - 0.03;
+  const claspTop = mesh(new RoundedBoxGeometry(1.8, 0.7, 0.16, 1, 0.025), M.metal, lb); claspTop.position.set(0, LID_H * 0.5, OD / 2 + 0.08);
   box.add(lid);
   lid.rotation.x = state.open ? OPEN_ANGLE : 0;
   scene.add(box);
@@ -699,7 +700,7 @@ async function start(){
   requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
-  window.__ecrin = { CONFIG, applyConfig, buildBox, setOpen, focusCell, cells:() => cells, requestRender, M, scene, frameView };
+  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, cells:() => cells, requestRender, M, scene, frameView };
 }
 start();
 </script>
