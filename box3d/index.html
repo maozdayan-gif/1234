@@ -1960,21 +1960,36 @@ async function commitPlacement(entry, plan, spot = plan.spot){
 const LOCAL_KEY = "ecrin-store-v2";
 function readLocal(){ try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "null") || { docs:{} }; } catch { return { docs:{} }; } }
 function writeLocal(st){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(st)); return true; } catch { return false; } }
-async function saveDoc(id, data){
+// Every database call is bounded in time, so a slow or stalled store can never freeze the page.
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code:"timeout", message:"timed out" }), ms))]);
+const pause = ms => new Promise(r => setTimeout(r, ms));
+async function saveDoc(id, data, { quiet = false } = {}){
   const body = JSON.parse(JSON.stringify(data));
-  if (storeMode === "db"){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id).set(body); return true; } catch (err) { console.warn(err); toastBox("This change couldn't be saved. Check your connection."); return false; } }
+  if (storeMode === "db"){
+    const ref = CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id);
+    for (let attempt = 0; attempt < 2; attempt++){
+      try { await withTimeout(ref.set(body), 15000); return true; }
+      catch (err) {
+        console.warn("save", id, err);
+        const code = err && err.code;
+        if (attempt === 0 && (code === "unavailable" || code === "timeout" || code === "resource_exhausted")){ await pause(1200 + Math.random() * 1500); continue; }
+        if (!quiet) toastBox(code === "quota_exceeded" ? "Your private storage is full; this change wasn't saved." : "This change couldn't be saved. Check your connection.");
+        return false;
+      }
+    }
+  }
   const st = readLocal(); st.docs[id] = body; if (!writeLocal(st)) toastBox("This browser's storage is full; the change wasn't saved.");
   return true;
 }
 async function deleteDoc(id){
-  if (storeMode === "db"){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id).delete(); return true; } catch (err) { console.warn(err); return false; } }
+  if (storeMode === "db"){ try { await withTimeout(CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id).delete(), 15000); return true; } catch (err) { console.warn(err); return false; } }
   const st = readLocal(); delete st.docs[id]; writeLocal(st); return true;
 }
 // Older records used a single slot number in a 6-compartment (3 × 2) box. `taken` holds "tray:row:col" keys.
 function legacyToPlacement(e, taken){
   if (!("slot" in e)) { if (e.placement === undefined){ e.placement = null; return true; } return false; }
-  const s = e.slot; delete e.slot;
-  if (e.placement === undefined && s != null && s >= 0 && s < 6){
+  const s = e.slot; delete e.slot;                      // the old field goes, even when a placement already exists
+  if (!e.placement && s != null && s >= 0 && s < 6){     // two old records can claim the same slot: the first keeps it, the other waits in the collection
     const p = { boxId:"main", tray:0, row:Math.floor(s / 3), col:s % 3 }, k = `0:${p.row}:${p.col}`;
     if (!taken.has(k)){ taken.add(k); e.placement = p; return true; }
   }
@@ -1985,7 +2000,8 @@ async function loadCollection(){
   await Promise.race([CLAUDE.ready, new Promise(r => setTimeout(r, 4000))]);
   let docs = [];
   if (CLAUDE.db && CLAUDE.uid){
-    try { docs = (await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get()).docs.map(d => ({ ...d.data(), id:d.data().id || d.id, _doc:d.id })); storeMode = "db"; } catch (err) { console.warn(err); }
+    try { docs = (await withTimeout(CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get(), 12000)).docs.map(d => ({ ...d.data(), id:d.data().id || d.id, _doc:d.id })); storeMode = "db"; }
+    catch (err) { console.warn(err); setTimeout(() => toastBox("Your collection couldn't be reached just now. Reload to try again."), 1600); }
   }
   if (storeMode !== "db") docs = Object.entries(readLocal().docs).map(([id, d]) => ({ ...d, id:d.id || id, _doc:id }));
   docs.forEach(d => delete d._doc);
@@ -2003,7 +2019,19 @@ async function loadCollection(){
   for (const e of watches){ if (legacyToPlacement(e, taken)) dirty.add(e.id); if (repairEntry(e)) dirty.add(e.id); }
   COLLECTION.length = 0; watches.forEach(w => COLLECTION.push(w));
   CONFIG.layout = BOX.layout;
-  for (const id of dirty) await saveDoc(id === "box" ? "box-" + BOX.id : id, id === "box" ? BOX : COLLECTION.find(e => e.id === id));
+  return [...dirty];
+}
+// Write the converted records after the box is on screen: watches first, the box record last, so an interrupted
+// run simply repeats on the next visit. One write at a time, gently paced; a failure never touches what's shown.
+async function persistMigration(dirty){
+  let failed = 0;
+  const ids = dirty.filter(id => id !== "box").concat(dirty.includes("box") ? ["box"] : []);
+  for (const id of ids){
+    const ok = await saveDoc(id === "box" ? "box-" + BOX.id : id, id === "box" ? BOX : COLLECTION.find(e => e.id === id), { quiet:true });
+    if (!ok){ failed++; if (id === "box") break; }
+    await pause(250);
+  }
+  if (failed) toastBox("Some changes couldn't be saved yet. They'll be saved on your next visit.");
 }
 
 /* ---------- editing a watch: the approved details form, filled from the record ---------- */
@@ -2188,12 +2216,19 @@ addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document
 /* ============ start ============ */
 async function start(){
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
-  await loadCollection(); sharedGeometries(); buildBox(); renderDock();
+  let pending = [];
+  try { pending = await loadCollection(); }
+  catch (err) {
+    console.error("load", err); pending = [];
+    if (!COLLECTION.some(e => e.placement !== undefined)){ const taken = new Set(); COLLECTION.length = 0; DEMO_SEED.forEach(d => { const e = JSON.parse(JSON.stringify(d)); legacyToPlacement(e, taken); COLLECTION.push(e); }); }
+  }
+  sharedGeometries(); buildBox(); renderDock();
   frameView(false);
   renderer.compile(scene, camera);
   requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
+  if (pending.length) setTimeout(() => persistMigration(pending), 1500);
   window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, BOX, switchTray, startMove, moveTo, placeInBox, removeFromBox, deleteWatch, confirmDelete, openEdit, openCollection, showWatch, planPlacement, isPlaced, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
 start();
