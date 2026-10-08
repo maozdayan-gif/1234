@@ -296,11 +296,26 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 <div class="boot" id="boot" hidden role="alert"><b>The box couldn't be shown</b><span>Please send this report to Claude:</span><pre id="boot-log"></pre></div>
 <script>
 // Start-up report: plain script, so it works even if the 3D module never loads.
-window.__boot = { t0:Date.now(), stage:"loading the 3D engine", errors:[] };
+window.__boot = { t0:Date.now(), stage:"loading the 3D engine", errors:[], log:[] };
+// The same report is kept in the owner's private storage (doc "diag-boot"), so Claude can read where start-up stopped.
+(function(){
+  const B = window.__boot; let chain = Promise.resolve(), ref = null;
+  const getRef = async () => {
+    if (ref) return ref;
+    if (!(window.claude && claude.use)) return null;
+    const [db, u] = await Promise.all([claude.use("db"), claude.use("user")]);
+    const id = u && await u.id(); if (!db || !id) return null;
+    return ref = db.collection("data/users/" + id).doc("diag-boot");
+  };
+  B.send = () => { chain = chain.then(async () => { try { const r = await getRef(); if (r) await Promise.race([r.set({ kind:"diag", version:10.1, at:new Date().toISOString(), stage:B.stage, done:!!B.done, ms:Date.now() - B.t0, errors:B.errors.slice(0, 10), log:B.log.slice(-30), ua:navigator.userAgent, screen:innerWidth + "x" + innerHeight + "@" + devicePixelRatio }), new Promise(res => setTimeout(res, 8000))]); } catch (e) { B.errors.push("diag: " + (e && (e.code || e.message) || e)); } }); };
+  B.mark = s => { B.stage = s; B.log.push(((Date.now() - B.t0) / 1000).toFixed(1) + "s " + s); B.send(); };
+  B.mark("page script running");
+  setTimeout(() => { if (!B.done){ B.log.push("30s: still not shown"); B.send(); } }, 30000);
+})();
 function __bootShow(){ const b = document.getElementById("boot"); if (!b) return; const B = window.__boot;
   document.getElementById("boot-log").textContent = ["stopped at: " + B.stage, "after: " + ((Date.now() - B.t0) / 1000).toFixed(1) + " s", ...B.errors.slice(0, 6), "browser: " + navigator.userAgent, "screen: " + innerWidth + "×" + innerHeight + " @" + devicePixelRatio].join("\n"); b.hidden = false; }
-addEventListener("error", e => { const B = window.__boot; B.errors.push("error: " + (e.message || (e.target && (e.target.src || e.target.href)) || "resource failed") + (e.lineno ? " (line " + e.lineno + ")" : "")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); }, true);
-addEventListener("unhandledrejection", e => { const B = window.__boot, r = e.reason; B.errors.push("rejected: " + (r && (r.code ? r.code + " " : "") + (r.message || r) || "unknown")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); });
+addEventListener("error", e => { const B = window.__boot; B.send && setTimeout(B.send, 0); B.errors.push("error: " + (e.message || (e.target && (e.target.src || e.target.href)) || "resource failed") + (e.lineno ? " (line " + e.lineno + ")" : "")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); }, true);
+addEventListener("unhandledrejection", e => { const B = window.__boot, r = e.reason; B.send && setTimeout(B.send, 0); B.errors.push("rejected: " + (r && (r.code ? r.code + " " : "") + (r.message || r) || "unknown")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); });
 setTimeout(() => { if (!window.__boot.done) __bootShow(); }, 30000);
 </script>
 
@@ -311,6 +326,7 @@ setTimeout(() => { if (!window.__boot.done) __bootShow(); }, 30000);
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+window.__boot && __boot.mark("3D engine loaded");
 
 /* =====================================================================
    CONFIGURATION — every finish is a parameter on one shared geometry.
@@ -2011,11 +2027,13 @@ function legacyToPlacement(e, taken){
 }
 async function loadCollection(){
   await Promise.race([CLAUDE.ready, new Promise(r => setTimeout(r, 4000))]);
+  window.__boot && __boot.mark(`storage ready: db ${CLAUDE.db ? "yes" : "no"}, user ${CLAUDE.uid ? "yes" : "no"}`);
   let docs = [];
   if (CLAUDE.db && CLAUDE.uid){
     try { docs = (await withTimeout(CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get(), 12000)).docs.map(d => ({ ...d.data(), id:d.data().id || d.id, _doc:d.id })); storeMode = "db"; }
     catch (err) { console.warn(err); setTimeout(() => toastBox("Your collection couldn't be reached just now. Reload to try again."), 1600); }
   }
+  window.__boot && __boot.mark(`read ${docs.length} records from ${storeMode}`);
   if (storeMode !== "db") docs = Object.entries(readLocal().docs).map(([id, d]) => ({ ...d, id:d.id || id, _doc:id }));
   docs.forEach(d => delete d._doc);
   const boxDoc = docs.find(d => d.kind === "box");
@@ -2212,7 +2230,9 @@ renderer.domElement.addEventListener("pointerup", e => {
 let dirty = true;
 function requestRender(shadows = false){ dirty = true; if (shadows) renderer.shadowMap.needsUpdate = true; }
 controls.addEventListener("change", requestRender);
+let firstFrame = true;
 function loop(now){
+  if (firstFrame){ firstFrame = false; window.__boot && __boot.mark("first frame drawn"); }
   requestAnimationFrame(loop);
   const ticked = tickHands(now);
   if (tweens.length && !passportOpen) renderer.shadowMap.needsUpdate = true;
@@ -2228,7 +2248,7 @@ addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document
 
 /* ============ start ============ */
 async function start(){
-  const B = window.__boot || { errors:[] }, stage = s => { B.stage = s; };
+  const B = window.__boot || { errors:[], mark(){} }, stage = s => B.mark(s);
   stage("fonts");
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
   let pending = [];
@@ -2244,7 +2264,7 @@ async function start(){
   stage("preparing materials"); try { renderer.compile(scene, camera); } catch (err) { B.errors.push("compile: " + (err && err.message || err)); }
   stage("first frame"); requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
-  B.done = Date.now(); stage("done");
+  B.done = Date.now(); stage("done: box shown");
   renderer.domElement.addEventListener("webglcontextlost", () => { B.errors.push("the graphics context was lost (device memory)"); stage("drawing"); __bootShow(); });
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
   if (pending.length) setTimeout(() => persistMigration(pending), 1500);
