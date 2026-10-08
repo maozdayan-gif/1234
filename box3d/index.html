@@ -232,6 +232,33 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 .prov-line{margin:12px auto 0;font:600 11px var(--sc);letter-spacing:.22em;font-variant:small-caps;color:var(--gilt);max-width:60ch}
 @media (prefers-reduced-motion:reduce){.ladder.thinking .rung .dot{animation:none}}
 [hidden]{display:none!important}
+.trays{display:flex;align-items:center;gap:6px;font:600 11px var(--sc);letter-spacing:.24em;font-variant:small-caps;color:var(--mute)}
+.trays span{margin-right:4px}
+.trays button{min-width:34px;height:30px;padding:0 8px;font:400 15px var(--display);color:var(--mute);background:rgba(13,18,21,.5);border:1px solid transparent;cursor:pointer}
+.trays button[aria-pressed="true"]{color:var(--ivory);border-color:var(--gilt)}
+.move-hint{display:flex;align-items:center;gap:14px;padding:9px 12px 9px 16px;background:rgba(13,18,21,.7);border:1px solid var(--gilt);color:var(--ivory);font:400 14px var(--serif);max-width:100%}
+.move-hint span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.move-hint button,.focus #focus-move{font:400 13px var(--serif);color:var(--ivory);background:none;border:0;border-left:1px solid var(--rule);padding:4px 4px 4px 14px;cursor:pointer;white-space:nowrap}
+.box-toast{margin:0;padding:9px 14px;background:var(--ivory);color:#15120c;font:400 14px var(--serif);max-width:min(520px,100%);text-align:center}
+.coll-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.coll-list li{display:flex;gap:8px;align-items:center}
+.coll-list li>button:first-child{flex:1;min-width:0;display:grid;gap:2px;text-align:left;background:none;border:1px solid var(--rule);color:var(--ivory);padding:10px 14px;cursor:pointer}
+.coll-list li>button:first-child:hover{border-color:var(--gilt)}
+.addw .sec.small{padding:6px 12px;font-size:13px;white-space:nowrap}
+.confirm .addw-panel{width:min(440px,100%)}
+.confirm h2{margin:0;font:400 26px var(--display);letter-spacing:.02em}
+.confirm p{margin:0;color:rgba(236,230,216,.82);line-height:1.55}
+.addw .danger-btn{background:#9b3a2e;border-color:#9b3a2e;color:#f6efe4}
+.lead.grow{color:var(--gilt)}
+#manage .where{margin:0 0 14px;font:italic 400 17px "Cormorant Garamond",Georgia,serif;color:var(--ink-soft)}
+.manage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mg{display:grid;gap:6px;text-align:left;padding:16px 18px;background:var(--paper);border:1px solid var(--hair);color:var(--ink);cursor:pointer;font:inherit}
+.mg:hover{border-color:#8d7547}
+.mg b{font:400 20px var(--display);letter-spacing:.02em;font-weight:400}
+.mg span{font-size:14px;color:var(--ink-soft);line-height:1.45}
+.mg.danger b{color:#9b3a2e}
+@media (max-width:760px){.manage{grid-template-columns:minmax(0,1fr)}}
+
 .diag pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:rgba(236,230,216,.8)}
 .diag summary.bad{color:#e2a08c}
 .hint-s.warn{color:#e2c08c}
@@ -241,8 +268,11 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 
 <div id="stage"></div>
 <header class="plate"><h1>Maoz Dayan</h1><span class="rule" aria-hidden="true"></span><span class="sc">Private Collection</span></header>
-<div class="dock"><div class="focus" id="focus" hidden aria-live="polite"><span class="fk" id="focus-k"></span><span class="fn" id="focus-n"></span><button id="focus-open">View watch</button></div>
-<nav class="bar" dir="rtl"><button id="b-add">+ הוספת שעון</button><button class="primary" id="b-lid">פתיחת המכסה</button><button id="b-reset">איפוס מבט</button></nav></div>
+<div class="dock"><p class="box-toast" id="box-toast" hidden role="status"></p>
+<div class="move-hint" id="move-hint" hidden><span></span><button id="move-cancel">Cancel</button></div>
+<div class="focus" id="focus" hidden aria-live="polite"><span class="fk" id="focus-k"></span><span class="fn" id="focus-n"></span><button id="focus-move">Move</button><button id="focus-open">View watch</button></div>
+<div class="trays" id="trays" hidden></div>
+<nav class="bar" dir="rtl"><button id="b-add">+ הוספת שעון</button><button id="b-coll">האוסף</button><button class="primary" id="b-lid">פתיחת המכסה</button><button id="b-reset">איפוס מבט</button></nav></div>
 <div class="dissolve" id="dissolve" hidden></div>
 <article class="passport" id="passport" hidden aria-label="Watch passport">
   <div class="pp-top"><button id="pp-back">← The box</button><div class="seg" role="group" aria-label="View as"><button data-viewer="owner" aria-pressed="true">Owner</button><button data-viewer="visitor">Visitor</button></div></div>
@@ -250,6 +280,8 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
   <p class="demo-note" id="demo-note">Demo collection · ownership details are examples</p>
   <div class="pp-body" id="pp-body"></div>
 </article>
+<section class="addw coll" id="coll" hidden role="dialog" aria-modal="true" aria-label="Collection"><div class="addw-panel"><header class="addw-head"><span></span><h2>Collection</h2><button id="coll-close" aria-label="Close">✕</button></header><div class="addw-body" id="coll-body"></div></div></section>
+<section class="addw confirm" id="confirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="confirm-h"><div class="addw-panel"><div class="addw-body"><h2 id="confirm-h"></h2><p></p><div class="acts col"><button class="pri danger-btn" id="confirm-yes">Delete permanently</button><button class="sec" id="confirm-no">Keep the watch</button></div></div></div></section>
 <section class="addw" id="addw" hidden role="dialog" aria-modal="true" aria-labelledby="addw-title">
   <div class="addw-panel">
     <header class="addw-head"><button id="addw-back">Cancel</button><h2 id="addw-title">Add a watch</h2><button id="addw-close" aria-label="Close">✕</button></header>
@@ -395,7 +427,6 @@ const COLLECTION = [
       owned:{ status:"owned", year:null, acquisition:null, startedOn:null, condition:null, box:null, papers:null, story:"", service:[], provenance:[], documents:[] },
       private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } }))
 ];
-const entryAt = slot => COLLECTION.find(e => e && e.slot === slot) || null;
 // What a visitor may see: model-level facts plus the public parts of this watch. Never `private`.
 function publicProjection(e){
   const { private:_omit, ...rest } = e;
@@ -927,7 +958,7 @@ function buildBox(){
       worn.add(buildBand(w));
       head = buildWatch(w); liveWatches.add(head.userData.hands); boxHandSets.push(head.userData.hands); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
     } else if (entry){ head = buildStandIn(entry); cushion.add(head); }
-    cell.userData = { slot:i, watch:w || (entry ? { standIn:true } : null), entry, head, cushion };
+    cell.userData = { slot:i, pos:{ tray:activeTray, row:r, col:c }, watch:w || (entry ? { standIn:true } : null), entry, head, cushion };
     box.add(cell); cells.push(cell);
   }
   // front hardware: clasp, keyhole, plaque
@@ -1117,7 +1148,7 @@ function fitDistance(width, height){
 function views(){
   const { OW, OD } = box.userData, open = state.open, portrait = camera.aspect < 0.8;
   const target = new THREE.Vector3(0, open ? (BASE_H + OD * 0.85) * 0.42 : BASE_H * 0.5, open ? -OD * 0.18 : 0);
-  const d = fitDistance(OW * (portrait ? 1.32 : 1.55), (open ? OD * 1.35 + BASE_H : OD * 0.75 + BASE_H) * (portrait ? 1.05 : 1.4));
+  const d = fitDistance(OW * (portrait ? 1.5 : 1.6), (open ? OD * 1.45 + BASE_H : OD * 0.8 + BASE_H) * (portrait ? 1.15 : 1.55));   // room for the dock below
   const polar = THREE.MathUtils.degToRad(open ? 48 : 58), az = THREE.MathUtils.degToRad(open ? 24 : 32);
   return { target, pos:new THREE.Vector3().setFromSphericalCoords(d, polar, az).add(target), d };
 }
@@ -1352,6 +1383,7 @@ function renderPassport(){
         ${row("Serial number", v(p.serial, NOTREC))}${row("Purchase date", fmtDate(p.purchaseDate) ? esc(fmtDate(p.purchaseDate)) : (raw.owned.acquisition === "purchase" ? NOTREC : `<span class="unk">Not a purchase</span>`))}
         ${row("Purchase price", fmtMoney(p.price) ? esc(fmtMoney(p.price)) : NOTREC)}${row("Purchased from", v(p.source, NOTREC))}
         ${row("Private notes", v(p.notes, NOTREC))}${row("Private documents", p.documents.length ? p.documents.length + " files" : NOTREC)}</dl>`) : ""}
+    ${viewer === "owner" ? manageSection(raw) : ""}
     <footer class="colophon"><span>${esc(e.id.toUpperCase())}</span><span>Écrin · Digital passport</span></footer>`;
   document.querySelectorAll("[data-viewer]").forEach(b => b.setAttribute("aria-pressed", b.dataset.viewer === viewer));
   document.getElementById("demo-note").hidden = viewer !== "owner" || !!raw.added;
@@ -1542,7 +1574,7 @@ function readLink(url){
 const addEl = document.getElementById("addw"), addBody = document.getElementById("addw-body"), addTitle = document.getElementById("addw-title");
 function openAdd(slot = null){
   if (state.focus) unfocus(true);
-  draft = newDraft(slot); addSlot = slot; addHistory = []; addBusy = false;
+  draft = newDraft(null); addSlot = slot; addHistory = []; addBusy = false;
   addEl.hidden = false; requestAnimationFrame(() => addEl.classList.add("on"));
   addGo("method", true);
 }
@@ -1553,12 +1585,12 @@ document.getElementById("addw-back").addEventListener("click", addBack);
 document.getElementById("addw-close").addEventListener("click", closeAdd);
 document.getElementById("b-add").addEventListener("click", () => openAdd(null));
 
-const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "photo" ? `AI · ${f.confirmed ? "confirmed by you" : CONF_WORD(f.confidence) + " confidence"}` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
+const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "catalogue" ? "From catalogue" : f.source === "photo" ? `AI · ${f.confirmed ? "confirmed by you" : CONF_WORD(f.confidence) + " confidence"}` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
 const srcList = () => draft.sources.length ? `<ul class="srcs">${draft.sources.map(s => `<li>${s.type === "photo" ? `<img src="${s.thumb}" alt="">Photo` : s.type === "link" ? `<span class="lk">↗</span><span class="u">${esc(s.url)}</span><em>${s.status === "failed" ? "kept as a source" : s.status === "partial" ? "partly read" : "read"}</em>` : "Manual entry"}</li>`).join("")}</ul>` : "";
 
 function drawAdd(){
   const T = { method:"Add a watch", photo:"Identify from photos", link:"Identify from a link", analyzing:"Identifying", result:"Identification", search:"Find the reference", details:"Confirm the details", place:"Place it in the box" };
-  addTitle.textContent = T[addStep] || "Add a watch";
+  addTitle.textContent = addStep === "details" && draft._edit ? "Edit watch" : T[addStep] || "Add a watch";
   document.getElementById("addw-back").textContent = addHistory.length ? "← Back" : "Cancel";
   addBody.innerHTML = VIEWS[addStep]();
   WIRE[addStep] && WIRE[addStep]();
@@ -1642,16 +1674,21 @@ const VIEWS = {
           <label class="fld"><span>How it came to you</span><select id="dt-acq"><option value="">Not recorded</option>${Object.entries(ACQ_LABEL).map(([k, l]) => `<option value="${k}" ${draft.owned.acquisition === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
         <p class="hint-s">Serial number, price and documents can be added later from the watch's passport. They stay private.</p>
         <p class="err" id="dt-err" hidden></p>
-        <div class="acts"><button class="pri" type="submit">Add to collection</button></div>
+        <div class="acts"><button class="pri" type="submit">${draft._edit ? "Save changes" : "Add to collection"}</button></div>
       </form>`;
   },
   place: () => {
-    const L = OPTIONS.layouts[CONFIG.layout], n = L.cols * L.rows, free = [];
-    for (let i = 0; i < n; i++) if (!entryAt(i)) free.push(i);
-    const grid = Array.from({ length:n }, (_, i) => `<button class="cell ${entryAt(i) ? "full" : ""} ${addSlot === i ? "sel" : ""}" ${entryAt(i) ? "disabled" : `data-slot="${i}"`} aria-label="Compartment ${i + 1}">${entryAt(i) ? "" : i + 1}</button>`).join("");
+    const plan = draft._plan || (draft._plan = planPlacement(addSlot));
+    const L = dimsOf(plan.layout), t = plan.spot.tray, n = L.cols * L.rows;
+    if (!draft._spot) draft._spot = plan.spot;
+    const grid = Array.from({ length:n }, (_, i) => { const r = Math.floor(i / L.cols), c = i % L.cols, full = !!placedAt(t, r, c), sel = draft._spot.tray === t && draft._spot.row === r && draft._spot.col === c;
+      return `<button class="cell ${full ? "full" : ""} ${sel ? "sel" : ""}" ${full ? "disabled" : `data-r="${r}" data-c="${c}"`} aria-label="Compartment ${i + 1}">${full ? "" : i + 1}</button>`; }).join("");
+    const grow = growthText(plan);
     return `<div class="verdict"><p class="kick">Added to your collection</p><p class="vb">${esc([F("brand"), F("model") || F("collection")].filter(Boolean).join(" "))}</p><p class="vr ${F("reference") ? "" : "unk"}">${F("reference") ? esc(F("reference")) : "Reference unknown"}</p></div>
-      ${free.length ? `<p class="lead">Choose a compartment, or keep it in the collection without a place in the box.</p><div class="slots" style="--cols:${L.cols}">${grid}</div>` : `<p class="lead">This box is full. The watch is in your collection, and you can give it a place when one is free.</p>`}
-      <div class="acts col">${free.length ? `<button class="pri" id="pl-go">Place it in the box</button>` : ""}<button class="sec" id="pl-skip">Keep it outside the box</button></div>`;
+      ${grow ? `<p class="lead grow">${esc(grow)}</p>` : ""}
+      <p class="lead">It goes into ${BOX.trays > 1 || plan.trays > 1 ? `Tray ${roman(t)}, ` : ""}compartment ${draft._spot.row * L.cols + draft._spot.col + 1}. Choose another free one if you prefer.</p>
+      <div class="slots" style="--cols:${L.cols}">${grid}</div>
+      <div class="acts col"><button class="pri" id="pl-go">Place it in the box</button><button class="sec" id="pl-skip">Keep it outside the box for now</button></div>`;
   }
 };
 
@@ -1738,17 +1775,20 @@ const WIRE = {
       if (known && !draft.catalogueId) draft.catalogueId = known.catalogueId;
       if (!ref) draft.catalogueId = null;
       const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = draft.photos.length ? "Saving photos…" : "Saving…";
+      if (draft._edit){ applyEdit(); return; }
       saveDraft().then(() => addGo("place"), () => { btn.disabled = false; btn.textContent = "Add to collection"; toastAdd("The watch couldn't be saved. Try again."); });
     });
   },
   place(){
-    document.querySelectorAll("[data-slot]").forEach(b => b.addEventListener("click", () => { addSlot = +b.dataset.slot; document.querySelectorAll(".cell").forEach(c => c.classList.toggle("sel", c === b)); }));
-    const pl = document.getElementById("pl-go");
-    if (pl) pl.addEventListener("click", () => {
-      if (addSlot == null){ const L = OPTIONS.layouts[CONFIG.layout]; for (let i = 0; i < L.cols * L.rows; i++) if (!entryAt(i)){ addSlot = i; break; } }
-      finish(addSlot);
+    const plan = draft._plan;
+    document.querySelectorAll(".cell[data-r]").forEach(b => b.addEventListener("click", () => { draft._spot = { tray:plan.spot.tray, row:+b.dataset.r, col:+b.dataset.c }; drawAdd(); }));
+    document.getElementById("pl-go").addEventListener("click", async () => {
+      const e = savedEntry, grew = growthText(plan), spot = draft._spot || plan.spot; closeAdd();
+      await commitPlacement(e, plan, spot);
+      toastBox(`Placed in ${spotLabel(e.placement)}.${grew ? " " + grew : ""}`);
+      setTimeout(() => { const cell = cells.find(c => c.userData.entry === e); if (cell) focusCell(cell); }, 900);
     });
-    document.getElementById("pl-skip").addEventListener("click", () => finish(null));
+    document.getElementById("pl-skip").addEventListener("click", () => { closeAdd(); rebuildBox(); toastBox("Kept in your collection, outside the box. Place it any time from Collection."); });
   }
 };
 function wireGo(){
@@ -1847,7 +1887,7 @@ async function saveDraft(){
   }
   const idx = indexMatch(d.reference);
   savedEntry = {
-    id:draft.id, slot:null, catalogueId:draft.catalogueId,
+    id:draft.id, placement:null, catalogueId:draft.catalogueId,
     identification:{ status:draft.catalogueId ? "identified" : d.reference ? "reference-known" : "unidentified", method:draft.ai ? "photo-ai" : draft.identification.method || "manual",
       confirmed:draft.identification.confirmed, inIndex:!!idx, fields:draft.fields,
       ai:draft.ai ? { levels:draft.ai.levels, observations:draft.ai.observations, visibleText:draft.ai.visibleText } : null },
@@ -1858,19 +1898,8 @@ async function saveDraft(){
     look:null, visual:photos.length ? "photo" : "card",
     owned:draft.owned, private:draft.private, added:true
   };
-  COLLECTION.push(savedEntry); await persistEntry(savedEntry);
+  COLLECTION.push(savedEntry); await saveDoc(savedEntry.id, savedEntry);
   if (failed) toastAdd("Some photos couldn't be stored at full size. Small copies are kept with the watch.");
-}
-function finish(slot){
-  savedEntry.slot = slot; persistEntry(savedEntry); closeAdd();
-  buildBox();
-  if (slot != null) setTimeout(() => { const cell = cells.find(c => c.userData.slot === slot); if (cell) focusCell(cell); }, 500);
-}
-// Added watches live in the viewer's private database when available, otherwise in this browser.
-async function persistEntry(e){
-  await CLAUDE.ready;
-  if (CLAUDE.db && CLAUDE.uid){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(e.id).set(JSON.parse(JSON.stringify(e))); return; } catch (err) { console.warn(err); } }
-  try { const all = JSON.parse(localStorage.getItem("ecrin-added") || "[]").filter(x => x.id !== e.id); all.push(e); localStorage.setItem("ecrin-added", JSON.stringify(all)); } catch {}
 }
 // Fixes records saved before the label and reference corrections. Returns true when something changed.
 function repairEntry(e){
@@ -1881,13 +1910,247 @@ function repairEntry(e){
   if (idn.fields && idn.fields.brand && b) idn.fields.brand.value = b;
   return changed;
 }
-async function restoreAdded(){
-  const add = e => { if (e && e.id && !COLLECTION.some(x => x && x.id === e.id)){ if (repairEntry(e)) persistEntry(e); COLLECTION.push(e); } };
-  try { JSON.parse(localStorage.getItem("ecrin-added") || "[]").forEach(add); } catch {}
-  await Promise.race([CLAUDE.ready, new Promise(r => setTimeout(r, 4000))]);
-  if (CLAUDE.db && CLAUDE.uid){ try { (await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get()).docs.forEach(d => add(d.data())); } catch (err) { console.warn(err); } }
-}
 const photoSrc = p => p.assetId ? "/_blob/" + p.assetId : p.thumb;
+
+/* =====================================================================
+   COLLECTION STORE — unlimited collection, one box (for now), placements by tray/row/column.
+   Every watch is a record; `placement` is { boxId, tray, row, col } or null (in the collection, not in the box).
+   The box record holds its layout and tray count; more boxes later simply add box records and boxIds.
+   Growth: 6 → 8 adds a column, 8 → 12 adds a row, beyond 12 adds trays of 12. Existing positions never move.
+   ===================================================================== */
+const BOX = { id:"main", kind:"box", name:"Main box", layout:6, trays:1, v:2 };
+const LAYOUT_STEPS = [6, 8, 12];
+let activeTray = 0, storeMode = "local";
+const DEMO_SEED = COLLECTION.filter(e => e && e.slot != null && e.slot < 6).map(e => JSON.parse(JSON.stringify(e)));
+const dimsOf = layout => OPTIONS.layouts[layout];
+const isPlaced = e => !!(e && e.placement && e.placement.boxId === BOX.id);
+const placedAt = (tray, row, col) => COLLECTION.find(e => isPlaced(e) && e.placement.tray === tray && e.placement.row === row && e.placement.col === col) || null;
+function entryAt(i){ const L = dimsOf(BOX.layout); return placedAt(activeTray, Math.floor(i / L.cols), i % L.cols); }
+function spotLabel(p){ const L = dimsOf(BOX.layout); return `${BOX.trays > 1 ? `Tray ${roman(p.tray)}, ` : ""}compartment ${p.row * L.cols + p.col + 1}`; }
+const roman = n => ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][n] || String(n + 1);
+function freeSpots(layout = BOX.layout, trays = BOX.trays){
+  const L = dimsOf(layout), out = [];
+  for (let t = 0; t < trays; t++) for (let r = 0; r < L.rows; r++) for (let c = 0; c < L.cols; c++) if (!placedAt(t, r, c)) out.push({ tray:t, row:r, col:c });
+  return out;
+}
+// Where a new watch would go, growing the box only as far as needed. Nothing is committed here.
+function planPlacement(prefer = null){
+  let layout = BOX.layout, trays = BOX.trays;
+  if (prefer && !placedAt(prefer.tray, prefer.row, prefer.col)) return { layout, trays, spot:prefer, grew:false };
+  let spots = freeSpots(layout, trays);
+  while (!spots.length){
+    const i = LAYOUT_STEPS.indexOf(layout);
+    if (i >= 0 && i < LAYOUT_STEPS.length - 1) layout = LAYOUT_STEPS[i + 1]; else trays++;
+    spots = freeSpots(layout, trays);
+  }
+  return { layout, trays, spot:spots[0], grew:layout !== BOX.layout || trays !== BOX.trays };
+}
+function growthText(plan){
+  if (!plan.grew) return "";
+  return plan.trays !== BOX.trays ? `A second layer is added: Tray ${roman(plan.trays - 1)}, with ${plan.layout} compartments.` : `The box grows from ${BOX.layout} to ${plan.layout} compartments. Every watch keeps its place.`;
+}
+async function commitPlacement(entry, plan, spot = plan.spot){
+  if (plan.grew){ BOX.layout = plan.layout; BOX.trays = plan.trays; CONFIG.layout = BOX.layout; await saveDoc("box-" + BOX.id, BOX); }
+  entry.placement = { boxId:BOX.id, tray:spot.tray, row:spot.row, col:spot.col };
+  await saveDoc(entry.id, entry);
+  activeTray = spot.tray; rebuildBox({ settle:true });
+}
+
+/* ---------- persistence: the owner's private database, or this browser as a fallback ---------- */
+const LOCAL_KEY = "ecrin-store-v2";
+function readLocal(){ try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "null") || { docs:{} }; } catch { return { docs:{} }; } }
+function writeLocal(st){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(st)); return true; } catch { return false; } }
+async function saveDoc(id, data){
+  const body = JSON.parse(JSON.stringify(data));
+  if (storeMode === "db"){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id).set(body); return true; } catch (err) { console.warn(err); toastBox("This change couldn't be saved. Check your connection."); return false; } }
+  const st = readLocal(); st.docs[id] = body; if (!writeLocal(st)) toastBox("This browser's storage is full; the change wasn't saved.");
+  return true;
+}
+async function deleteDoc(id){
+  if (storeMode === "db"){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(id).delete(); return true; } catch (err) { console.warn(err); return false; } }
+  const st = readLocal(); delete st.docs[id]; writeLocal(st); return true;
+}
+// Older records used a single slot number in a 6-compartment (3 × 2) box. `taken` holds "tray:row:col" keys.
+function legacyToPlacement(e, taken){
+  if (!("slot" in e)) { if (e.placement === undefined){ e.placement = null; return true; } return false; }
+  const s = e.slot; delete e.slot;
+  if (e.placement === undefined && s != null && s >= 0 && s < 6){
+    const p = { boxId:"main", tray:0, row:Math.floor(s / 3), col:s % 3 }, k = `0:${p.row}:${p.col}`;
+    if (!taken.has(k)){ taken.add(k); e.placement = p; return true; }
+  }
+  if (e.placement === undefined) e.placement = null;
+  return true;
+}
+async function loadCollection(){
+  await Promise.race([CLAUDE.ready, new Promise(r => setTimeout(r, 4000))]);
+  let docs = [];
+  if (CLAUDE.db && CLAUDE.uid){
+    try { docs = (await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get()).docs.map(d => ({ ...d.data(), id:d.data().id || d.id, _doc:d.id })); storeMode = "db"; } catch (err) { console.warn(err); }
+  }
+  if (storeMode !== "db") docs = Object.entries(readLocal().docs).map(([id, d]) => ({ ...d, id:d.id || id, _doc:id }));
+  docs.forEach(d => delete d._doc);
+  const boxDoc = docs.find(d => d.kind === "box");
+  let watches = docs.filter(d => d.kind !== "box" && typeof d.id === "string" && d.id.startsWith("w-"));
+  const dirty = new Set();
+  if (!boxDoc){
+    // First run of the collection store: the demo watches become the owner's records; earlier additions are carried over.
+    try { for (const e of JSON.parse(localStorage.getItem("ecrin-added") || "[]")) if (!watches.some(w => w.id === e.id)) watches.push(e); } catch {}
+    const seed = DEMO_SEED.filter(d => !watches.some(w => w.id === d.id)).map(e => ({ ...JSON.parse(JSON.stringify(e)), demo:true }));
+    watches = [...seed, ...watches];
+    Object.assign(BOX, { layout:6, trays:1 }); dirty.add("box");
+  } else Object.assign(BOX, boxDoc);
+  const taken = new Set(watches.filter(e => e.placement).map(e => `${e.placement.tray}:${e.placement.row}:${e.placement.col}`));
+  for (const e of watches){ if (legacyToPlacement(e, taken)) dirty.add(e.id); if (repairEntry(e)) dirty.add(e.id); }
+  COLLECTION.length = 0; watches.forEach(w => COLLECTION.push(w));
+  CONFIG.layout = BOX.layout;
+  for (const id of dirty) await saveDoc(id === "box" ? "box-" + BOX.id : id, id === "box" ? BOX : COLLECTION.find(e => e.id === id));
+}
+
+/* ---------- editing a watch: the approved details form, filled from the record ---------- */
+function openEdit(e){
+  if (state.focus) unfocus(true);
+  draft = newDraft(null); draft._edit = e; draft.catalogueId = e.catalogueId || null; addHistory = []; addBusy = false;
+  const c = e.catalogueId && CATALOGUE[e.catalogueId], d = e.described || {};
+  const base = c ? { brand:c.brand, collection:c.collection, model:c.model, reference:c.reference, variant:c.variant } : d;
+  for (const k of ["brand", "collection", "model", "reference", "variant"]) if (base[k]) draft.fields[k] = (e.identification && e.identification.fields && e.identification.fields[k]) || { value:base[k], source:c ? "catalogue" : "manual", confidence:1 };
+  if (e.owned && e.owned.year) draft.fields.year = { value:String(e.owned.year), source:"manual", confidence:1 };
+  draft.owned = JSON.parse(JSON.stringify(e.owned || {})); draft.sources = (e.sources || []).slice();
+  addEl.hidden = false; requestAnimationFrame(() => addEl.classList.add("on"));
+  addGo("details", true);
+}
+async function applyEdit(){
+  const e = draft._edit;
+  const d = { brand:canonBrand(F("brand")), collection:F("collection"), model:F("model"), reference:cleanRef(F("reference")).value, variant:F("variant") };
+  const c = e.catalogueId && CATALOGUE[e.catalogueId];
+  if (c && normRef(c.reference) !== normRef(d.reference)) e.catalogueId = null;
+  if (!e.catalogueId){ const m = indexMatch(d.reference); if (m && m.catalogueId) e.catalogueId = m.catalogueId; }
+  e.described = { ...(e.described || {}), ...d, label:d.model || d.collection || (e.described && e.described.label) || "Watch", detail:d.variant || (e.described && e.described.detail) || "" };
+  e.identification = { ...(e.identification || {}), fields:draft.fields, status:e.catalogueId ? "identified" : d.reference ? "reference-known" : "unidentified" };
+  e.owned = { ...(e.owned || {}), ...draft.owned };
+  const ok = await saveDoc(e.id, e);
+  closeAdd(); if (passportOpen) renderPassport(); rebuildBox(); if (ok) toastBox("Changes saved.");
+}
+
+/* ---------- box rebuild with a quiet "tray settles" motion ---------- */
+function rebuildBox({ settle = false } = {}){
+  if (state.focus){ state.focus = null; focusPill.classList.remove("on"); focusPill.hidden = true; }
+  CONFIG.layout = BOX.layout; buildBox(); frameView(true, 1.0); renderDock();
+  if (settle) cells.forEach((c, k) => { const y = c.position.y; c.position.y = y + 3.2; tween(0.75 + k * 0.03, easeOut, t => { c.position.y = y + 3.2 * (1 - t); }); });
+}
+function switchTray(t){ if (t === activeTray || t < 0 || t >= BOX.trays) return; activeTray = t; rebuildBox({ settle:true }); }
+
+/* ---------- dock: tray switcher, move mode hint, collection button ---------- */
+const trayNav = document.getElementById("trays"), moveHint = document.getElementById("move-hint");
+function renderDock(){
+  trayNav.hidden = BOX.trays < 2;
+  trayNav.innerHTML = BOX.trays < 2 ? "" : `<span>Tray</span>${Array.from({ length:BOX.trays }, (_, t) => `<button data-tray="${t}" aria-pressed="${t === activeTray}" aria-label="Tray ${t + 1}">${roman(t)}</button>`).join("")}`;
+  trayNav.querySelectorAll("[data-tray]").forEach(b => b.addEventListener("click", () => switchTray(+b.dataset.tray)));
+  const out = COLLECTION.filter(e => e && !isPlaced(e)).length;
+  document.getElementById("b-coll").textContent = out ? `האוסף · ${out} מחוץ לקופסה` : "האוסף";
+}
+let toastT = null;
+function toastBox(msg){ const t = document.getElementById("box-toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 4200); }
+
+/* ---------- rearranging: pick a watch, then a compartment ---------- */
+let moving = null;
+function startMove(entry){
+  moving = entry; unfocus(true);
+  moveHint.hidden = false; moveHint.querySelector("span").textContent = `Choose a compartment for ${titleOf(entry).name}`;
+  requestRender();
+}
+function endMove(){ moving = null; moveHint.hidden = true; }
+async function moveTo(spot){
+  const e = moving; endMove(); if (!e) return;
+  const other = placedAt(spot.tray, spot.row, spot.col);
+  if (other === e) return;
+  const from = e.placement ? { ...e.placement } : null;
+  e.placement = { boxId:BOX.id, ...spot };
+  if (other){ other.placement = from ? { ...from } : null; await saveDoc(other.id, other); }
+  await saveDoc(e.id, e);
+  rebuildBox();
+  toastBox(other ? (from ? "Swapped places." : "Placed. The watch that was there is now outside the box.") : "Moved.");
+}
+document.getElementById("move-cancel").addEventListener("click", endMove);
+document.getElementById("focus-move").addEventListener("click", () => state.focus && startMove(state.focus.userData.entry));
+
+/* ---------- collection sheet: every watch, in or out of the box ---------- */
+const collEl = document.getElementById("coll");
+function openCollection(){
+  const rows = COLLECTION.filter(Boolean).map(e => { const t = titleOf(e);
+    return `<li><button data-id="${esc(e.id)}"><span class="cb">${esc(t.kicker)}</span><span class="cm">${esc(t.name)}</span><span class="cr">${isPlaced(e) ? esc(spotLabel(e.placement)) : "Not in the box"}</span></button>${isPlaced(e) ? "" : `<button class="sec small" data-place="${esc(e.id)}">Place in box</button>`}</li>`; }).join("");
+  document.getElementById("coll-body").innerHTML = `<p class="lead">${COLLECTION.filter(Boolean).length} watches · ${COLLECTION.filter(isPlaced).length} in the box</p><ul class="coll-list">${rows}</ul>`;
+  collEl.hidden = false; requestAnimationFrame(() => collEl.classList.add("on"));
+  collEl.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = COLLECTION.find(x => x && x.id === b.dataset.id); closeCollection(); showWatch(e); }));
+  collEl.querySelectorAll("[data-place]").forEach(b => b.addEventListener("click", async () => { const e = COLLECTION.find(x => x && x.id === b.dataset.place); await placeInBox(e); openCollection(); }));
+}
+function closeCollection(){ collEl.classList.remove("on"); setTimeout(() => collEl.hidden = true, 300); }
+document.getElementById("b-coll").addEventListener("click", openCollection);
+document.getElementById("coll-close").addEventListener("click", closeCollection);
+// Open a watch: from its compartment when it's in the box, otherwise straight to its passport.
+function showWatch(e){
+  if (isPlaced(e)){
+    if (e.placement.tray !== activeTray){ activeTray = e.placement.tray; rebuildBox(); }
+    const cell = cells.find(c => c.userData.entry === e);
+    if (cell){ openPassport(cell); return; }
+  }
+  openPassportFor(e);
+}
+async function placeInBox(e){
+  const plan = planPlacement(); const grew = growthText(plan);
+  await commitPlacement(e, plan);
+  toastBox(`Placed in ${spotLabel(e.placement)}.${grew ? " " + grew : ""}`);
+}
+
+/* ---------- passport management: edit, remove from box / place in box, delete ---------- */
+async function removeFromBox(e){ e.placement = null; await saveDoc(e.id, e); rebuildBox(); toastBox("Removed from the box. It stays in your collection."); }
+function confirmDelete(e){
+  const t = titleOf(e), n = (e.photos || []).filter(p => p.assetId).length, docs = (e.private?.documents || []).length + (e.owned?.documents || []).length;
+  const el = document.getElementById("confirm");
+  el.querySelector("h2").textContent = `Delete ${[t.kicker === "Awaiting identification" ? "" : t.kicker, t.name].filter(Boolean).join(" ")}?`;
+  el.querySelector("p").textContent = `This permanently removes the watch from your collection: its record, ownership details and private information${n ? `, and its ${n} photograph${n > 1 ? "s" : ""}` : ""}${docs ? ` and ${docs} document${docs > 1 ? "s" : ""}` : ""}. It can't be undone.`;
+  el.hidden = false; requestAnimationFrame(() => el.classList.add("on"));
+  const yes = el.querySelector("#confirm-yes"), no = el.querySelector("#confirm-no");
+  const close = () => { el.classList.remove("on"); setTimeout(() => el.hidden = true, 250); yes.onclick = no.onclick = null; };
+  no.onclick = close; yes.onclick = async () => { close(); await deleteWatch(e); };
+  no.focus();
+}
+async function deleteWatch(e){
+  await CLAUDE.ready;
+  if (CLAUDE.assets) for (const p of e.photos || []) if (p.assetId){ try { await CLAUDE.assets.delete(p.assetId); } catch {} }
+  const ok = await deleteDoc(e.id);
+  if (!ok){ toastBox("The watch couldn't be deleted. Try again."); return; }
+  const i = COLLECTION.indexOf(e); if (i >= 0) COLLECTION.splice(i, 1);
+  if (passportOpen) closePassport();
+  rebuildBox(); toastBox("Deleted from your collection.");
+}
+document.getElementById("pp-body").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-manage]"); if (!b || !passportEntry) return;
+  const e = passportEntry, act = b.dataset.manage;
+  if (act === "edit") openEdit(e);
+  else if (act === "remove") removeFromBox(e).then(() => renderPassport());
+  else if (act === "place") placeInBox(e).then(() => renderPassport());
+  else if (act === "delete") confirmDelete(e);
+});
+function manageSection(raw){
+  return `<section class="sec" id="manage"><header><span class="sc"></span><h2>Manage</h2></header><div class="body">
+    <p class="where">${isPlaced(raw) ? `In the box · ${esc(spotLabel(raw.placement))}` : "In your collection · not in the box"}</p>
+    <div class="manage">
+      <button class="mg" data-manage="edit"><b>Edit watch</b><span>Brand, model, reference and ownership details.</span></button>
+      ${isPlaced(raw) ? `<button class="mg" data-manage="remove"><b>Remove from box</b><span>It stays in your collection, without a compartment.</span></button>`
+        : `<button class="mg" data-manage="place"><b>Place in box</b><span>Into the first free compartment. The box grows if it's full.</span></button>`}
+      <button class="mg danger" data-manage="delete"><b>Delete watch</b><span>Permanently removes it from your collection.</span></button>
+    </div></div></section>`;
+}
+// Passport opened without a compartment (the watch is outside the box).
+function openPassportFor(e){
+  passportEntry = e; camBeforePassport = null;
+  dissolve.hidden = false; requestAnimationFrame(() => dissolve.classList.add("on"));
+  setTimeout(() => {
+    renderPassport(); passport.hidden = false; passport.scrollTop = 0; passportOpen = true; heroShow(e, false);
+    requestAnimationFrame(() => { passport.classList.add("on"); dissolve.classList.remove("on"); });
+    setTimeout(() => { dissolve.hidden = true; }, 700);
+  }, 450);
+}
 
 /* ============ picking ============ */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
@@ -1900,7 +2163,8 @@ renderer.domElement.addEventListener("pointerup", e => {
   if (!hits.length){ if (state.focus) unfocus(); return; }
   if (!state.open) return setOpen(true);
   let o = hits[0].object; while (o && !(o.userData && "slot" in o.userData)) o = o.parent;
-  if (o && o.userData.watch) focusCell(o); else if (o && "slot" in o.userData) openAdd(o.userData.slot); else if (state.focus) unfocus();
+  if (moving){ if (o && o.userData.pos) moveTo(o.userData.pos); return; }
+  if (o && o.userData.watch) focusCell(o); else if (o && o.userData.pos) openAdd(o.userData.pos); else if (state.focus) unfocus();
 });
 
 /* ============ render loop (only while something changes) ============ */
@@ -1919,18 +2183,18 @@ function loop(now){
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!state.focus) frameView(false); requestRender(); });
 lidBtn.addEventListener("click", () => setOpen(!state.open));
 document.getElementById("b-reset").addEventListener("click", () => { if (state.focus) unfocus(true); frameView(true, 1.1); });
-addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
+addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document.getElementById("confirm").hidden) document.getElementById("confirm-no").click(); else if (moving) endMove(); else if (!collEl.hidden) closeCollection(); else if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
 
 /* ============ start ============ */
 async function start(){
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
-  await restoreAdded(); sharedGeometries(); buildBox();
+  await loadCollection(); sharedGeometries(); buildBox(); renderDock();
   frameView(false);
   renderer.compile(scene, camera);
   requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
-  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
+  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, BOX, switchTray, startMove, moveTo, placeInBox, removeFromBox, deleteWatch, confirmDelete, openEdit, openCollection, showWatch, planPlacement, isPlaced, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
 start();
 </script>
