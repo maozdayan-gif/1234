@@ -207,6 +207,28 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 .addw-toast{position:absolute;left:16px;right:16px;bottom:16px;margin:0;padding:10px 14px;background:var(--ivory);color:#15120c;font-size:14px}
 @media (max-width:560px){.addw{padding:0}.addw-panel{width:100%;height:100%;max-height:none;border:0}.two{grid-template-columns:minmax(0,1fr)}.rung{grid-template-columns:14px 92px minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){.addw{transition:none}}
+
+.thumbs .th{position:relative;display:inline-block}
+.thumbs .th button{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:#141b1f;color:var(--ivory);font-size:11px;cursor:pointer;line-height:1}
+.ladder.thinking .rung .dot{animation:pulse 1.4s ease-in-out infinite}
+.ladder.thinking .rung:nth-child(2) .dot{animation-delay:.15s}.ladder.thinking .rung:nth-child(3) .dot{animation-delay:.3s}.ladder.thinking .rung:nth-child(4) .dot{animation-delay:.45s}.ladder.thinking .rung:nth-child(5) .dot{animation-delay:.6s}
+@keyframes pulse{50%{background:rgba(180,147,90,.55)}}
+.rung em small{display:block;margin-top:2px;font:italic 400 13px "Cormorant Garamond",Georgia,serif;color:var(--mute);line-height:1.35}
+.ai-note{margin:10px 0 0;font:italic 400 14px "Cormorant Garamond",Georgia,serif;color:var(--mute)}
+.idx{margin:6px 0 0;font:600 10.5px var(--sc);letter-spacing:.2em;font-variant:small-caps;color:var(--gilt)}.idx.muted{color:var(--mute)}
+.cand .ce{font:italic 400 14px "Cormorant Garamond",Georgia,serif;color:rgba(236,230,216,.75);margin-top:4px}
+.cand .ct{font:600 10px var(--sc);letter-spacing:.18em;font-variant:small-caps;color:var(--gilt);margin-top:4px}
+.seen{border:1px solid rgba(180,147,90,.25);padding:10px 14px}
+.seen summary{cursor:pointer;font:600 11px var(--sc);letter-spacing:.24em;font-variant:small-caps;color:var(--gilt)}
+.seen dl{margin:10px 0 0;display:grid;gap:8px}.seen dl div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;font-size:13.5px}
+.seen dt{color:var(--mute);text-transform:capitalize}.seen dd{margin:0;color:rgba(236,230,216,.85);overflow-wrap:anywhere}
+.hero-photos{position:absolute;inset:62px 0 0;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px clamp(16px,6vw,80px) 26px}
+.hero-photos img{height:100%;max-width:min(88vw,680px);object-fit:contain;scroll-snap-align:center;flex:none;margin:0 auto;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.hp-empty{margin:auto;display:grid;gap:8px;text-align:center;padding:40px 46px;background:#efe8da;color:#1d1c19;border:1px solid rgba(120,96,58,.4)}
+.hp-empty span{font:600 12px var(--sc);letter-spacing:.3em;font-variant:small-caps;color:#8d7547}.hp-empty b{font:400 34px var(--display);font-weight:400}.hp-empty em{font:italic 400 17px "Cormorant Garamond",Georgia,serif;color:#6a6358}
+.prov-line{margin:12px auto 0;font:600 11px var(--sc);letter-spacing:.22em;font-variant:small-caps;color:var(--gilt);max-width:60ch}
+@media (prefers-reduced-motion:reduce){.ladder.thinking .rung .dot{animation:none}}
+[hidden]{display:none!important}
 .veil{position:fixed;inset:0;background:var(--night);transition:opacity 1s;pointer-events:none}
 </style>
 
@@ -217,7 +239,7 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 <div class="dissolve" id="dissolve" hidden></div>
 <article class="passport" id="passport" hidden aria-label="Watch passport">
   <div class="pp-top"><button id="pp-back">← The box</button><div class="seg" role="group" aria-label="View as"><button data-viewer="owner" aria-pressed="true">Owner</button><button data-viewer="visitor">Visitor</button></div></div>
-  <div class="pp-hero"><canvas id="hero-canvas"></canvas><div class="hero-views"><button data-hero="dial">Dial</button><button data-hero="three" aria-pressed="true">Three-quarter</button><button data-hero="profile">Profile</button></div></div>
+  <div class="pp-hero"><canvas id="hero-canvas"></canvas><div class="hero-photos" id="hero-photos" hidden></div><div class="hero-views"><button data-hero="dial">Dial</button><button data-hero="three" aria-pressed="true">Three-quarter</button><button data-hero="profile">Profile</button></div></div>
   <p class="demo-note" id="demo-note">Demo collection · ownership details are examples</p>
   <div class="pp-body" id="pp-body"></div>
 </article>
@@ -897,8 +919,8 @@ function buildBox(){
       const worn = new THREE.Group(); worn.rotation.x = WATCH_TILT; cushion.add(worn);
       worn.add(buildBand(w));
       head = buildWatch(w); liveWatches.add(head.userData.hands); boxHandSets.push(head.userData.hands); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
-    }
-    cell.userData = { slot:i, watch:w, entry, head, cushion };
+    } else if (entry){ head = buildStandIn(entry); cushion.add(head); }
+    cell.userData = { slot:i, watch:w || (entry ? { standIn:true } : null), entry, head, cushion };
     box.add(cell); cells.push(cell);
   }
   // front hardware: clasp, keyhole, plaque
@@ -921,6 +943,38 @@ function buildBox(){
   scene.add(box);
   applyConfig();
   requestRender(true);
+}
+
+
+/* A watch without an accurate 3D model is shown by the collector's own photo, mounted like a print resting on
+   the cushion; with no photo, a written label. Nothing about the watch is invented. */
+function labelCanvas(e){
+  const W = 640, H = 800, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+  g.fillStyle = "#efe8da"; g.fillRect(0, 0, W, H); g.strokeStyle = "rgba(120,96,58,.55)"; g.lineWidth = 3; g.strokeRect(28, 28, W - 56, H - 56);
+  const d = e.described || {}; g.textAlign = "center"; g.fillStyle = "#8d7547"; g.font = `600 30px "Cormorant SC", Georgia, serif`;
+  g.fillText((d.brand || "").toUpperCase().split("").join(" "), W / 2, 300);
+  g.fillStyle = "#1d1c19"; g.font = `400 58px "Bellefair", Georgia, serif`; g.fillText(d.model || d.collection || "Watch", W / 2, 390, W - 100);
+  g.fillStyle = "#6a6358"; g.font = `italic 400 34px "Cormorant Garamond", Georgia, serif`; g.fillText(d.reference || "Reference unknown", W / 2, 450, W - 100);
+  g.font = `italic 400 26px "Cormorant Garamond", Georgia, serif`; g.fillText("No photograph yet", W / 2, 620);
+  return c;
+}
+function buildStandIn(e){
+  const grp = new THREE.Group(), W = 4.3, H = 5.3;
+  const print = new THREE.Group(); print.position.set(0, CUSH_R + 1.15, 0.2); print.rotation.x = -Math.PI / 2 + 0.62; grp.add(print);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(W + 0.32, H + 0.32, 0.06), new THREE.MeshStandardMaterial({ color:0xf1ece1, roughness:0.85 }));
+  back.position.z = -0.035; back.castShadow = true; back.receiveShadow = true; print.add(back);
+  const mat = new THREE.MeshStandardMaterial({ roughness:0.55, color:0xffffff });
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(W, H), mat); face.position.z = 0.002; print.add(face);
+  const p = (e.photos || [])[0];
+  if (p){
+    new THREE.TextureLoader().load(photoSrc(p), t => {
+      t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+      const ia = t.image.width / t.image.height, fa = W / H;   // cover-crop the photo to the print
+      if (ia > fa){ t.repeat.set(fa / ia, 1); t.offset.set((1 - fa / ia) / 2, 0); } else { t.repeat.set(1, ia / fa); t.offset.set(0, (1 - ia / fa) / 2); }
+      mat.map = t; mat.needsUpdate = true; requestRender(true);
+    }, undefined, () => { if (p.assetId && p.thumb){ p.assetId = null; } });
+  } else { const t = new THREE.CanvasTexture(labelCanvas(e)); t.colorSpace = THREE.SRGBColorSpace; mat.map = t; }
+  return grp;
 }
 
 /* ============ camera ============ */
@@ -1047,7 +1101,19 @@ function heroView(name, dur = 1.2){
   document.querySelectorAll("[data-hero]").forEach(b => b.setAttribute("aria-pressed", b.dataset.hero === name));
 }
 function heroShow(entry, fromBox){
-  const h = ensureHero(); h.size();
+  const hp = document.getElementById("hero-photos"), cv = document.getElementById("hero-canvas"), hv = document.querySelector(".hero-views");
+  if (entry.visual){
+    // no accurate 3D model: the collector's own photographs are the hero
+    cv.hidden = true; hv.hidden = true; hp.hidden = false;
+    hp.innerHTML = (entry.photos || []).length ? entry.photos.map((p, k) => `<img src="${photoSrc(p)}" alt="Photograph ${k + 1} of the watch" data-thumb="${p.thumb}">`).join("")
+      : `<div class="hp-empty"><span>${esc(entry.described?.brand || "")}</span><b>${esc(entry.described?.model || entry.described?.collection || "Watch")}</b><em>No photograph yet</em></div>`;
+    hp.querySelectorAll("img").forEach(im => im.addEventListener("error", () => { if (im.dataset.thumb && im.src !== im.dataset.thumb) im.src = im.dataset.thumb; }, { once:true }));
+    if (hero && hero.set) liveWatches.delete(hero.set);
+    if (hero) hero.paused = true;
+    return;
+  }
+  cv.hidden = false; hv.hidden = false; hp.hidden = true;
+  const h = ensureHero(); h.size(); h.paused = false;
   if (h.obj){ h.sc.remove(h.obj); liveWatches.delete(h.set); }
   // the watch as if on a wrist: its band closed in a loop, the head on top, presented dial-up
   const g = new THREE.Group(); g.add(buildBand(entry.look));
@@ -1114,6 +1180,9 @@ function renderPassport(){
       <p class="kick sc">${esc(t.kicker)}</p>
       <h1>${esc(c ? c.model : t.name)}</h1>
       ${c ? `<p class="variant">${esc(c.variant)}</p>` : `<p class="variant">${esc(e.described?.detail || "")}</p>`}
+      ${(() => { const idn = e.identification || {};
+        const t = idn.method === "photo-ai" && c ? `Identified by AI from photographs${idn.confirmed ? ", confirmed by the owner" : ""} · reference matched to Écrin's catalogue` : c ? "Matched to Écrin's reference catalogue" : idn.method === "photo-ai" ? `Identified by AI from photographs${idn.confirmed ? ", confirmed by the owner" : ""} · not verified${idn.inIndex ? " · reference found in Écrin's index" : ""}` : e.added ? "Details entered by the owner · not verified" : "";
+        return t ? `<p class="prov-line">${t}</p>` : ""; })()}
       <dl class="strip">
         ${row("Reference", c ? esc(c.reference) : e.described?.reference ? esc(e.described.reference) : UNKNOWN)}
         ${row("Year", v(o.year))}
@@ -1153,7 +1222,7 @@ function renderPassport(){
         ${row("Private notes", v(p.notes, NOTREC))}${row("Private documents", p.documents.length ? p.documents.length + " files" : NOTREC)}</dl>`) : ""}
     <footer class="colophon"><span>${esc(e.id.toUpperCase())}</span><span>Écrin · Digital passport</span></footer>`;
   document.querySelectorAll("[data-viewer]").forEach(b => b.setAttribute("aria-pressed", b.dataset.viewer === viewer));
-  document.getElementById("demo-note").hidden = viewer !== "owner";
+  document.getElementById("demo-note").hidden = viewer !== "owner" || !!raw.added;
 }
 const LOCK_SVG = `<svg width="13" height="15" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7.5" rx="1" fill="none" stroke="currentColor"/><path d="M3.2 6V4a2.8 2.8 0 0 1 5.6 0v2" fill="none" stroke="currentColor"/></svg>`;
 document.getElementById("pp-back").addEventListener("click", closePassport);
@@ -1182,22 +1251,14 @@ const REF_INDEX = [
   { brand:"Audemars Piguet", collection:"Royal Oak", model:"Royal Oak Jumbo Extra-Thin", reference:"15202ST.OO.1240ST.01", variant:"Blue dial" },
   { brand:"Grand Seiko", collection:"Heritage", model:"Snowflake", reference:"SBGA211", variant:"Spring Drive" }
 ];
-const SIM_PHOTO = {
-  confident:  { label:"Confident match", candidates:[{ ref:1, conf:{ brand:.99, collection:.98, model:.97, reference:.93, variant:.9 } }] },
-  candidates: { label:"Several candidates", candidates:[
-                { ref:3, conf:{ brand:.97, collection:.95, model:.82, reference:.58, variant:.5 } },
-                { ref:4, conf:{ brand:.97, collection:.95, model:.82, reference:.31, variant:.3 } },
-                { ref:6, conf:{ brand:.2, collection:.18, model:.16, reference:.11, variant:.1 } }] },
-  modelOnly:  { label:"Model identified, reference unknown", candidates:[{ ref:7, conf:{ brand:.98, collection:.95, model:.91, reference:0, variant:0 } }] },
-  none:       { label:"Not recognised", candidates:[] }
-};
 const CONFIDENT = 0.8; // below this a level is never asserted, only offered
 
 /* ---------- the draft record ---------- */
-let draft = null, addStep = "method", addHistory = [], simPhoto = "confident", simLink = "auto", addSlot = null, addBusy = false;
+let draft = null, addStep = "method", addHistory = [], addSlot = null, addBusy = false, addError = null;
 function newDraft(slot){
   return { id:"w-" + Date.now().toString(36), slot, catalogueId:null,
-    identification:{ status:"unidentified", method:null, candidates:[], chosen:null },
+    identification:{ status:"unidentified", method:null, candidates:[], chosen:null, confirmed:false },
+    photos:[], ai:null,
     fields:{},            // field -> { value, source, confidence }
     sources:[],           // { type:"photo"|"link"|"manual", ... }
     owned:{ status:"owned", year:null, acquisition:null, startedOn:null, condition:null, box:null, papers:null, story:"", service:[], provenance:[], documents:[] },
@@ -1215,23 +1276,106 @@ function contribute(source, values, confidence = {}){
 }
 const F = k => draft.fields[k]?.value ?? "";
 
-/* ---------- simulated engines ---------- */
 const wait = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
-async function identifyPhotos(){
-  const sim = SIM_PHOTO[simPhoto];
-  return sim.candidates.map(c => ({ ...REF_INDEX[c.ref], conf:c.conf }));
+/* ---------- real identification (Claude vision, through the Artifact's `sample` capability) ----------
+   The page keeps the session: every run sends all photos (up to the per-call limit) plus what earlier
+   runs found, then merges level by level, so new photos refine instead of restarting.
+   AI answers are labelled as AI and never as verified; only the page's own index lookup marks a match. */
+const CONF = { high:0.9, medium:0.6, low:0.3, none:0 };
+const CONF_WORD = c => c >= 0.8 ? "high" : c >= 0.5 ? "medium" : c > 0 ? "low" : "none";
+const CLAUDE = { sample:null, assets:null, db:null, user:null, uid:null, ready:null };
+CLAUDE.ready = (async () => {
+  if (!(window.claude && typeof window.claude.use === "function")) return;
+  const [s, a, d, u] = await Promise.all(["sample", "assets", "db", "user"].map(n => claude.use(n).catch(() => null)));
+  Object.assign(CLAUDE, { sample:s, assets:a, db:d, user:u });
+  try { CLAUDE.uid = u ? await u.id() : null; } catch {}
+})();
+const normRef = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+function indexMatch(ref){ const n = normRef(ref); return n.length >= 4 ? REF_INDEX.find(r => normRef(r.reference) === n) || null : null; }
+function idPrompt(nPhotos, prev, omitted){
+  const index = REF_INDEX.map(r => `${r.brand} | ${r.model} | ${r.reference}${r.variant ? " | " + r.variant : ""}`).join("\n");
+  return `You are helping a watch collector catalogue a watch they own. Attached ${nPhotos === 1 ? "is 1 photo" : `are ${nPhotos} photos`} of ONE wristwatch.
+Identify it on five levels, each judged independently: brand, collection, model, reference, variant.
+
+Look closely at: the dial (layout, indices, hands, printed text, colour, finish), the bezel (type, scale, insert), the case (shape, lugs, finish), crown and crown guards, pushers, the bracelet or strap (link style, end links), the clasp (type, engravings), the caseback (engravings, numbers, display back) and complications (date, chronograph, GMT, moonphase, small seconds).
+
+Rules. Accuracy matters more than completeness.
+- Base every answer only on what is visible in these photos. Never guess. Never invent a reference number.
+- confidence: "high" = clear visual evidence (a name printed on the dial, a reference engraved, or a combination of features that only one answer has); "medium" = likely, but another answer remains plausible; "low" = a weak hint; "none" = cannot tell, and then value is null.
+- reference: give a value only if it is legible in a photo, or if the visible features match exactly one reference. Otherwise value null. If 2 or 3 references are plausible, list them in "candidates" (strongest first) and say in their evidence what would tell them apart.
+- variant: the dial colour, material, bezel and bracelet configuration as seen.
+- evidence: one short phrase per level naming the visual cue (at most 18 words).
+- observations.visibleText: every piece of text you can read, exactly as printed, including partial words.
+- If the photos do not show a wristwatch, set isWatch to false.
+- photoAdvice: one sentence naming the single extra photo that would most help pin down the reference (for example the caseback, the clasp or the side of the case), or "" if nothing would help.
+${prev ? `\nEarlier photos in this session gave these findings: ${JSON.stringify(prev)}${omitted ? ` (${omitted} earlier photo(s) are not attached this time)` : ""}. Use the photos to confirm, refine or correct them. Keep earlier findings that the photos do not contradict.\n` : ""}
+Écrin's reference index, small and incomplete, for orientation only (a watch may well not be in it):
+${index}
+
+Reply with JSON only, in exactly this shape:
+{"isWatch":true,"levels":{"brand":{"value":null,"confidence":"none","evidence":""},"collection":{"value":null,"confidence":"none","evidence":""},"model":{"value":null,"confidence":"none","evidence":""},"reference":{"value":null,"confidence":"none","evidence":""},"variant":{"value":null,"confidence":"none","evidence":""}},"candidates":[],"observations":{"dial":"","bezel":"","case":"","crown":"","bracelet":"","clasp":"","caseback":"","complications":"","visibleText":[]},"photoAdvice":""}
+Each candidate: {"brand":"","collection":"","model":"","reference":"","variant":"","confidence":"medium","evidence":""}`;
 }
-// Link reading: recognises a few page patterns; anything else is kept as a source for manual entry.
-function readLink(url){
-  const u = url.toLowerCase();
-  const mode = simLink !== "auto" ? simLink : (/rolex\.com.*m?116500ln/.test(u) || /rolex\.com.*m?124060/.test(u) || /patek\.com.*5167a/.test(u)) ? "full" : /chrono24|watchfinder|hodinkee|omega/.test(u) ? "partial" : "failed";
-  if (mode === "failed") return { status:"failed", fields:{} };
-  if (mode === "full"){
-    const r = /124060/.test(u) ? REF_INDEX[0] : /5167a/.test(u) ? REF_INDEX[7] : REF_INDEX[1];
-    return { status:"parsed", fields:{ brand:r.brand, collection:r.collection, model:r.model, reference:r.reference, variant:r.variant }, catalogueId:r.catalogueId || null };
+const str = (x, n = 240) => typeof x === "string" ? x.trim().slice(0, n) : "";
+function normalizeAI(r){
+  const levels = {};
+  for (const l of LEVELS){
+    const x = r && r.levels && r.levels[l] || {}, v = str(x.value, 120), c = v ? (CONF[x.confidence] ?? 0) : 0;
+    levels[l] = { value:c > 0 ? v : null, conf:c, evidence:str(x.evidence, 200) };
   }
-  const r = /omega/.test(u) ? REF_INDEX[3] : REF_INDEX[2];
-  return { status:"partial", fields:{ brand:r.brand, collection:r.collection, model:r.model, year:"2021" } };
+  const candidates = (Array.isArray(r && r.candidates) ? r.candidates : []).filter(c => c && str(c.reference)).slice(0, 3).map(c => ({
+    brand:str(c.brand, 80) || levels.brand.value, collection:str(c.collection, 80) || levels.collection.value, model:str(c.model, 120) || levels.model.value,
+    reference:str(c.reference, 60), variant:str(c.variant, 120), conf:CONF[c.confidence] ?? 0.3, evidence:str(c.evidence, 200) }));
+  const o = r && r.observations || {};
+  const observations = Object.fromEntries(["dial", "bezel", "case", "crown", "bracelet", "clasp", "caseback", "complications"].map(k => [k, str(o[k], 300)]).filter(([, v]) => v));
+  const visibleText = Array.isArray(o.visibleText) ? o.visibleText.map(t => str(t, 80)).filter(Boolean).slice(0, 24) : [];
+  return { isWatch:!(r && r.isWatch === false), levels, candidates, observations, visibleText, advice:str(r && r.photoAdvice, 200) };
+}
+// Combine with the previous run: per level, keep whichever answer is better supported; a new answer with at least
+// the same confidence replaces the old one.
+function mergeAI(prev, next){
+  if (!prev) return next;
+  const levels = {};
+  for (const l of LEVELS) levels[l] = next.levels[l].conf >= prev.levels[l].conf ? next.levels[l] : prev.levels[l];
+  return { ...next, isWatch:next.isWatch || prev.isWatch, levels, candidates:next.candidates.length || levels.reference.conf >= CONFIDENT ? next.candidates : prev.candidates,
+    observations:{ ...prev.observations, ...next.observations }, visibleText:[...new Set([...prev.visibleText, ...next.visibleText])].slice(0, 30) };
+}
+class IdError extends Error { constructor(code, msg){ super(msg); this.code = code; } }
+let idAbort = null, idTimedOut = false;
+async function identifyPhotos(onStatus){
+  await CLAUDE.ready;
+  if (!CLAUDE.sample) throw new IdError("unavailable", "");
+  const caps = await CLAUDE.sample.limits().catch(() => null);
+  if (!caps || !caps.images) throw new IdError("images_unavailable", "");
+  const photos = draft.photos, max = Math.max(1, caps.images.maxCount || 1);
+  const send = photos.slice(-max), omitted = photos.length - send.length;
+  const prev = draft.ai ? Object.fromEntries(LEVELS.map(l => [l, { value:draft.ai.levels[l].value, confidence:CONF_WORD(draft.ai.levels[l].conf) }])) : null;
+  idAbort = new AbortController(); idTimedOut = false;
+  const timer = setTimeout(() => { idTimedOut = true; idAbort.abort(); }, 180000);
+  let started = false;
+  try {
+    const raw = await CLAUDE.sample.json(idPrompt(send.length, prev, omitted), {
+      images:send.map(p => p.blob), modelTier:"complex", signal:idAbort.signal,
+      onText:() => { if (!started){ started = true; onStatus("writing"); } } });
+    return normalizeAI(raw);
+  } catch (e) {
+    if (e instanceof IdError) throw e;
+    const code = idTimedOut ? "timeout" : (e && e.code) || "failed";
+    throw new IdError(code, e && e.message || "");
+  } finally { clearTimeout(timer); idAbort = null; }
+}
+
+/* ---------- link: read what the address itself says (the page is not fetched) ---------- */
+const BRAND_DOMAINS = [["rolex", "Rolex"], ["tudorwatch", "Tudor"], ["omegawatches", "Omega"], ["patek", "Patek Philippe"], ["audemarspiguet", "Audemars Piguet"], ["grand-seiko", "Grand Seiko"], ["grandseiko", "Grand Seiko"],
+  ["seikowatches", "Seiko"], ["cartier", "Cartier"], ["iwc.com", "IWC Schaffhausen"], ["jaeger-lecoultre", "Jaeger-LeCoultre"], ["vacheron-constantin", "Vacheron Constantin"], ["panerai", "Panerai"], ["breitling", "Breitling"],
+  ["tagheuer", "TAG Heuer"], ["longines", "Longines"], ["zenith-watches", "Zenith"], ["blancpain", "Blancpain"], ["breguet", "Breguet"], ["hublot", "Hublot"], ["chopard", "Chopard"], ["alange-soehne", "A. Lange & Söhne"], ["nomos-glashuette", "Nomos Glashütte"]];
+function readLink(url){
+  let u; try { u = new URL(url); } catch { return { status:"failed", fields:{} }; }
+  const host = u.hostname.toLowerCase(), path = normRef(decodeURIComponent(u.pathname + " " + u.search));
+  const ref = REF_INDEX.find(r => normRef(r.reference).length >= 5 && path.includes(normRef(r.reference)));
+  if (ref) return { status:"parsed", fields:{ brand:ref.brand, collection:ref.collection, model:ref.model, reference:ref.reference, variant:ref.variant }, catalogueId:ref.catalogueId || null };
+  const b = BRAND_DOMAINS.find(([d]) => host.includes(d));
+  return b ? { status:"partial", fields:{ brand:b[1] } } : { status:"failed", fields:{} };
 }
 
 /* ---------- shell ---------- */
@@ -1249,7 +1393,7 @@ document.getElementById("addw-back").addEventListener("click", addBack);
 document.getElementById("addw-close").addEventListener("click", closeAdd);
 document.getElementById("b-add").addEventListener("click", () => openAdd(null));
 
-const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "photo" ? `Photo · ${Math.round(f.confidence * 100)}%` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
+const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "photo" ? `AI · ${f.confirmed ? "confirmed by you" : CONF_WORD(f.confidence) + " confidence"}` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
 const srcList = () => draft.sources.length ? `<ul class="srcs">${draft.sources.map(s => `<li>${s.type === "photo" ? `<img src="${s.thumb}" alt="">Photo` : s.type === "link" ? `<span class="lk">↗</span><span class="u">${esc(s.url)}</span><em>${s.status === "failed" ? "kept as a source" : s.status === "partial" ? "partly read" : "read"}</em>` : "Manual entry"}</li>`).join("")}</ul>` : "";
 
 function drawAdd(){
@@ -1268,31 +1412,54 @@ const VIEWS = {
       <button class="way" data-go="link"><span class="wn">Identify from a link</span><span class="wd">Paste a page that shows the watch: a brand page, a listing or an article.</span></button>
       <button class="way" data-go="details" data-manual="1"><span class="wn">Add manually</span><span class="wd">Type what you know. Only the brand is needed; everything else can wait.</span></button>
     </div>`,
-  photo: () => `<label class="drop" for="ph-in"><span class="dz">Add photos</span><span class="wd">The dial straight on works best. The caseback and the clasp help with the reference.</span><input id="ph-in" type="file" accept="image/*" multiple></label>
-    <div class="thumbs">${draft.sources.filter(s => s.type === "photo").map(s => `<img src="${s.thumb}" alt="">`).join("")}</div>
-    <fieldset class="sim"><legend>Prototype · simulated result</legend>${Object.entries(SIM_PHOTO).map(([k, s]) => `<label><input type="radio" name="sim" value="${k}" ${simPhoto === k ? "checked" : ""}> ${s.label}</label>`).join("")}</fieldset>
-    <div class="acts"><button class="pri" id="ph-go" ${draft.sources.some(s => s.type === "photo") ? "" : "disabled"}>Identify</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
+  photo: () => {
+    const n = draft.photos.length;
+    return `<label class="drop" for="ph-in"><span class="dz">${n ? "Add more photos" : "Add photos"}</span><span class="wd">The dial straight on works best. The caseback, the clasp and the side of the case help with the reference.</span><input id="ph-in" type="file" accept="image/*" multiple></label>
+    <div class="thumbs">${draft.photos.map((p, k) => `<span class="th"><img src="${p.thumb}" alt="Photo ${k + 1}"><button type="button" data-rm="${k}" aria-label="Remove photo ${k + 1}">✕</button></span>`).join("")}</div>
+    ${draft.ai ? `<p class="hint-s">Earlier findings are kept. New photos refine them.</p>` : ""}
+    <p class="hint-s" id="ph-note"></p>
+    <div class="acts"><button class="pri" id="ph-go" ${n ? "" : "disabled"}>${draft.ai ? "Identify again" : "Identify"}</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="details" data-manual="1">Add manually</button></div>`;
+  },
   link: () => `<label class="fld"><span>Page address</span><input id="ln-in" type="url" inputmode="url" placeholder="https://" autocomplete="off"></label>
-    <p class="hint-s">Not every site can be read automatically. If it can't, the link is still saved with the watch.</p>
-    <fieldset class="sim"><legend>Prototype · simulated reading</legend>${[["auto", "Decide from the address"], ["full", "Page read in full"], ["partial", "Page partly read"], ["failed", "Page can't be read"]].map(([k, l]) => `<label><input type="radio" name="siml" value="${k}" ${simLink === k ? "checked" : ""}> ${l}</label>`).join("")}</fieldset>
-    <div class="acts"><button class="pri" id="ln-go">Read the page</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
-  analyzing: () => `<div class="ladder">${LEVELS.map(l => `<div class="rung" data-l="${l}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em></em></div>`).join("")}</div><p class="hint-s" id="an-msg">${draft.identification.method === "link" ? "Reading the page" : "Looking at the dial, case and bracelet"}</p>`,
+    <p class="hint-s">Écrin reads what the address itself shows, such as the brand's site or a reference in the link. The page isn't opened yet. The link is always kept with the watch.</p>
+    <div class="acts"><button class="pri" id="ln-go">Read the link</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
+  analyzing: () => `<div class="ladder ${draft._linkRun ? "" : "thinking"}">${LEVELS.map(l => `<div class="rung" data-l="${l}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em></em></div>`).join("")}</div>
+    <p class="hint-s" id="an-msg">${draft._linkRun ? "Reading the link" : "Studying the dial, bezel, case, bracelet, clasp and caseback. This usually takes under a minute."}</p>
+    ${draft._linkRun ? "" : `<p class="hint-s" id="an-time" aria-live="off"></p><div class="acts col"><button class="sec" id="an-stop">Stop</button></div>`}`,
+  error: () => {
+    const E = { not_granted:["Permission needed", "Photo identification uses your Claude account and needs your permission. Reload the page and allow it when asked, or continue another way."],
+      unavailable:["Not available here", "Photo identification works when Écrin is opened in Claude. Your photos are kept; you can continue another way."],
+      images_unavailable:["Not available here", "This view can't send photos for analysis. Your photos are kept; you can continue another way."],
+      image_rejected:["A photo couldn't be read", "One of the photos is in a format or size that couldn't be analysed. Remove it or try a JPEG or PNG."],
+      rate_limited:["Too many requests", "Wait a minute and try again, or continue another way."],
+      timeout:["This took too long", "The analysis didn't finish in time. Try again, or with fewer photos."],
+      failed:["Identification didn't finish", "Something went wrong during the analysis. Try again, or continue another way."] };
+    const [h, t] = E[addError] || E.failed;
+    const retry = !["not_granted", "unavailable", "images_unavailable"].includes(addError);
+    return `<div class="verdict"><p class="kick">${h}</p><p class="lead">${t}</p></div>${srcList()}
+      <div class="acts col">${retry ? `<button class="pri" id="er-retry">Try again</button>` : ""}<button class="sec" data-go="photo">Back to the photos</button><button class="sec" data-go="link">Paste a link</button><button class="${retry ? "sec" : "pri"}" data-go="details" data-manual="1">Add manually</button></div>`;
+  },
   result: () => {
-    const cands = draft.identification.candidates, top = cands[0];
-    const ladder = c => `<div class="ladder small">${LEVELS.map(l => { const k = c.conf[l] ?? 0; return `<div class="rung ${k >= CONFIDENT ? "ok" : k > 0 ? "maybe" : "no"}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em>${k >= CONFIDENT ? esc(c[l] || "—") : k > 0 ? "Not certain" : "Unknown"}</em></div>`; }).join("")}</div>`;
-    if (!cands.length) return `<div class="verdict"><p class="kick">Not recognised</p><p class="lead">We couldn't identify this watch from the photos. That's fine: add it yourself, and identification can try again later with more photos.</p></div>
-      ${srcList()}<div class="acts col"><button class="pri" data-go="details" data-manual="1">Add manually</button><button class="sec" data-go="photo">Add another photo</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="search">Search for the reference</button></div>`;
-    const confident = cands.length === 1 && (top.conf.reference ?? 0) >= CONFIDENT;
-    const modelOnly = cands.length === 1 && (top.conf.model ?? 0) >= CONFIDENT && (top.conf.reference ?? 0) < CONFIDENT;
-    if (confident) return `<div class="verdict"><p class="kick">We think this is</p><p class="vb">${esc(top.brand)} ${esc(top.model)}</p><p class="vr">${esc(top.reference)}${top.variant ? " — " + esc(top.variant) : ""}</p></div>${ladder(top)}
-      <div class="acts col"><button class="pri" data-pick="0">Yes, this is my watch</button><button class="sec" data-go="search">It's a different reference</button><button class="sec" data-go="details" data-manual="1">None of these · add manually</button></div>`;
-    if (modelOnly) return `<div class="verdict"><p class="kick">We recognise the model</p><p class="vb">${esc(top.brand)} ${esc(top.model)}</p><p class="vr unk">Reference not certain</p></div>${ladder(top)}
-      <p class="lead">To narrow it down to the exact reference:</p>
-      <div class="acts col"><button class="sec" data-go="photo">Add another photo · caseback or clasp</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="search" data-q="${esc(top.brand + " " + top.model)}">Search the references</button><button class="pri" data-pick="0" data-noref="1">Continue with the reference unknown</button></div>`;
-    return `<div class="verdict"><p class="kick">It could be one of these</p><p class="lead">Pick the one that matches your watch.</p></div>
-      <div class="cands">${cands.map((c, i) => `<button class="cand" data-pick="${i}"><span class="cb">${esc(c.brand)}</span><span class="cm">${esc(c.model)}</span><span class="cr">${esc(c.reference)}${c.variant ? " — " + esc(c.variant) : ""}</span><span class="meter"><i style="width:${Math.round((c.conf.reference || c.conf.model) * 100)}%"></i></span></button>`).join("")}
+    const a = draft.ai, L = a.levels, cands = a.candidates;
+    const word = c => ({ high:"high confidence", medium:"medium confidence", low:"low confidence", none:"unknown" }[CONF_WORD(c)]);
+    const ladder = `<div class="ladder small">${LEVELS.map(l => { const x = L[l]; return `<div class="rung ${x.conf >= CONFIDENT ? "ok" : x.conf > 0 ? "maybe" : "no"}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em>${x.value ? esc(x.value) : "Unresolved"}<small>${word(x.conf)}${x.evidence ? " · " + esc(x.evidence) : ""}</small></em></div>`; }).join("")}</div>`;
+    const seen = Object.keys(a.observations).length || a.visibleText.length ? `<details class="seen"><summary>What Écrin saw</summary><dl>${Object.entries(a.observations).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}${a.visibleText.length ? `<div><dt>Text</dt><dd>${a.visibleText.map(t => `“${esc(t)}”`).join(", ")}</dd></div>` : ""}</dl></details>` : "";
+    const aiNote = `<p class="ai-note">AI identification from your photos · not verified</p>`;
+    const more = `<button class="sec" data-go="photo">${a.advice ? "Add another photo · " + esc(a.advice.replace(/\.$/, "")) : "Add another photo"}</button><button class="sec" data-go="link">Paste a link</button>`;
+    if (!a.isWatch || !L.brand.value) return `<div class="verdict"><p class="kick">Not recognised</p><p class="lead">${a.isWatch ? "Écrin couldn't identify this watch from the photos." : "These photos don't seem to show a watch."} That's fine: add it yourself, and identification can try again later with more photos.</p></div>
+      ${seen}${srcList()}<div class="acts col"><button class="pri" data-go="details" data-manual="1">Add manually</button>${more}<button class="sec" data-go="search">Search for the reference</button></div>`;
+    const name = [L.brand.value, L.model.value || L.collection.value].filter(Boolean).join(" ");
+    if (cands.length >= 2) return `<div class="verdict"><p class="kick">It could be one of these</p><p class="vb">${esc(name)}</p>${aiNote}</div>${ladder}
+      <p class="lead">The reference isn't certain. Pick the one that matches your watch:</p>
+      <div class="cands">${cands.map((c, k) => { const m = indexMatch(c.reference); return `<button class="cand" data-cand="${k}"><span class="cb">${esc(c.brand || "")}</span><span class="cm">${esc(c.model || "")}</span><span class="cr">${esc(c.reference)}${c.variant ? " — " + esc(c.variant) : ""}</span>${c.evidence ? `<span class="ce">${esc(c.evidence)}</span>` : ""}<span class="ct">AI · ${word(c.conf)}${m ? " · in Écrin's reference index" : ""}</span></button>`; }).join("")}
       <button class="cand none" data-go="details" data-manual="1"><span class="cm">None of these</span><span class="cr">Add manually</span></button></div>
-      <div class="acts col"><button class="sec" data-go="photo">Add another photo</button><button class="sec" data-go="link">Paste a link</button></div>`;
+      ${seen}<div class="acts col">${more}<button class="sec" data-pick="noref">Continue with the reference unknown</button></div>`;
+    const m = L.reference.value && indexMatch(L.reference.value);
+    if (L.reference.conf >= CONFIDENT) return `<div class="verdict"><p class="kick">We think this is</p><p class="vb">${esc(name)}</p><p class="vr">${esc(L.reference.value)}${L.variant.value ? " — " + esc(L.variant.value) : ""}</p>${aiNote}${m ? `<p class="idx">Reference found in Écrin's reference index</p>` : `<p class="idx muted">Reference not in Écrin's index yet</p>`}</div>${ladder}${seen}
+      <div class="acts col"><button class="pri" data-pick="all">Yes, this is my watch</button>${more}<button class="sec" data-go="search">It's a different reference</button><button class="sec" data-go="details" data-manual="1">None of these · add manually</button></div>`;
+    return `<div class="verdict"><p class="kick">${L.model.value ? "We recognise the model" : "We recognise the brand"}</p><p class="vb">${esc(name)}</p><p class="vr unk">Reference ${L.reference.value ? "uncertain: " + esc(L.reference.value) + "?" : "not resolved"}</p>${aiNote}</div>${ladder}${seen}
+      <p class="lead">To narrow it down to the exact reference:</p>
+      <div class="acts col">${more}<button class="sec" data-go="search" data-q="${esc(name)}">Search the references</button><button class="pri" data-pick="noref">Continue with the reference unknown</button><button class="sec" data-go="details" data-manual="1">Add manually</button></div>`;
   },
   search: () => `<label class="fld"><span>Brand, model or reference</span><input id="sr-in" type="search" autocomplete="off" placeholder="e.g. Aquanaut, 5167A, Speedmaster" value="${esc(draft._q || "")}"></label>
     <div class="results" id="sr-out"></div>
@@ -1328,32 +1495,45 @@ const WIRE = {
   method(){ wireGo(); },
   photo(){
     wireGo();
-    document.querySelectorAll('[name="sim"]').forEach(r => r.addEventListener("change", () => simPhoto = r.value));
+    addBody.querySelectorAll("[data-rm]").forEach(b => b.addEventListener("click", () => { const k = +b.dataset.rm; const p = draft.photos.splice(k, 1)[0]; draft.sources = draft.sources.filter(x => x.photo !== p); drawAdd(); }));
     document.getElementById("ph-in").addEventListener("change", async e => {
-      for (const file of [...e.target.files].slice(0, 6)){ try { draft.sources.push({ type:"photo", name:file.name, thumb:await thumbOf(file), at:new Date().toISOString() }); } catch {} }
+      const note = document.getElementById("ph-note"); let bad = 0;
+      for (const file of [...e.target.files].slice(0, 12 - draft.photos.length)){
+        try { const p = await preparePhoto(file); draft.photos.push(p); draft.sources.push({ type:"photo", thumb:p.thumb, photo:p, at:new Date().toISOString() }); } catch { bad++; }
+      }
       drawAdd();
+      if (bad) document.getElementById("ph-note").textContent = bad === 1 ? "One photo couldn't be opened. HEIC photos may need converting to JPEG on this device." : `${bad} photos couldn't be opened. HEIC photos may need converting to JPEG on this device.`;
     });
     document.getElementById("ph-go").addEventListener("click", runPhoto);
   },
   link(){
     wireGo();
-    document.querySelectorAll('[name="siml"]').forEach(r => r.addEventListener("change", () => simLink = r.value));
     const go = () => { const url = document.getElementById("ln-in").value.trim(); if (!/^https?:\/\/\S+\.\S+/i.test(url)){ document.getElementById("ln-in").focus(); document.getElementById("ln-in").setCustomValidity("Paste a full address starting with https://"); document.getElementById("ln-in").reportValidity(); return; } runLink(url); };
     document.getElementById("ln-go").addEventListener("click", go);
     document.getElementById("ln-in").addEventListener("input", e => e.target.setCustomValidity(""));
     document.getElementById("ln-in").addEventListener("keydown", e => { if (e.key === "Enter") go(); });
   },
+  analyzing(){ const st = document.getElementById("an-stop"); if (st) st.addEventListener("click", () => { if (idAbort) idAbort.abort(); }); },
+  error(){ wireGo(); const r = document.getElementById("er-retry"); if (r) r.addEventListener("click", runPhoto); },
   result(){
     wireGo();
-    document.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => {
-      const c = draft.identification.candidates[+b.dataset.pick];
-      const conf = { ...c.conf }; if (b.dataset.noref){ conf.reference = 0; conf.variant = 0; }
-      // the collector's confirmation turns the candidate into fact, except the levels left unknown
-      const vals = {}; for (const l of LEVELS) if (!(b.dataset.noref && (l === "reference" || l === "variant"))) vals[l] = c[l];
-      contribute("search", vals);
-      for (const l of Object.keys(vals)) if (draft.fields[l]?.source === "search") { draft.fields[l].confidence = conf[l] ?? 1; draft.fields[l].source = "photo"; }
-      draft.identification.chosen = c; draft.catalogueId = b.dataset.noref ? null : (c.catalogueId || null);
+    const a = draft.ai, L = a.levels;
+    // The collector's choice: AI values are kept as AI-sourced, marked as confirmed, never as verified.
+    const take = (vals, conf) => {
+      for (const [k, v] of Object.entries(vals)){ if (!v) continue; draft.fields[k] = { value:v, source:"photo", confidence:conf[k] ?? 0, confirmed:true }; }
+      draft.identification.confirmed = true;
+      const m = vals.reference && indexMatch(vals.reference); draft.catalogueId = m && m.catalogueId || null;
       addGo("details");
+    };
+    addBody.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => {
+      const keep = b.dataset.pick === "all" ? LEVELS : ["brand", "collection", "model"];
+      const vals = {}, conf = {}; for (const l of keep) if (L[l].value && L[l].conf > 0){ vals[l] = L[l].value; conf[l] = L[l].conf; }
+      if (b.dataset.pick === "noref"){ delete draft.fields.reference; delete draft.fields.variant; }
+      take(vals, conf);
+    }));
+    addBody.querySelectorAll("[data-cand]").forEach(b => b.addEventListener("click", () => {
+      const c = a.candidates[+b.dataset.cand];
+      take({ brand:c.brand, collection:c.collection, model:c.model, reference:c.reference, variant:c.variant }, { brand:L.brand.conf, collection:L.collection.conf, model:L.model.conf, reference:c.conf, variant:c.conf });
     }));
   },
   search(){
@@ -1382,7 +1562,8 @@ const WIRE = {
       const known = REF_INDEX.find(r => r.reference.toUpperCase() === ref && r.catalogueId);
       if (known && !draft.catalogueId) draft.catalogueId = known.catalogueId;
       if (!ref) draft.catalogueId = null;
-      saveDraft(); addGo("place");
+      const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = draft.photos.length ? "Saving photos…" : "Saving…";
+      saveDraft().then(() => addGo("place"), () => { btn.disabled = false; btn.textContent = "Add to collection"; toastAdd("The watch couldn't be saved. Try again."); });
     });
   },
   place(){
@@ -1415,59 +1596,98 @@ async function climb(results){
   await wait(380);
 }
 async function runPhoto(){
-  draft.identification.method = "photo"; addBusy = true; addGo("analyzing");
-  const cands = await identifyPhotos();
-  // merge with anything already known (a link read earlier may have fixed the brand)
-  const best = cands[0]?.conf || null;
-  await climb(cands.length > 1 ? { brand:cands[0].conf.brand, collection:cands[0].conf.collection, model:cands[0].conf.model * .9, reference:.4, variant:.3 } : best);
-  draft.identification.candidates = cands; draft.identification.status = cands.length ? "candidates" : "unrecognised";
-  if (cands.length === 1) for (const l of ["brand", "collection", "model"]) contribute("photo", { [l]:cands[0][l] }, cands[0].conf);
-  addBusy = false; addGo("result");
+  if (!draft.photos.length) return;
+  draft.identification.method = "photo-ai"; draft._linkRun = false; addBusy = true; addGo("analyzing");
+  const t0 = performance.now(), msg = () => document.getElementById("an-msg"), tm = document.getElementById("an-time");
+  const tick = setInterval(() => { if (tm && document.body.contains(tm)) tm.textContent = `${Math.round((performance.now() - t0) / 1000)} s`; }, 1000);
+  try {
+    const res = await identifyPhotos(stage => { if (stage === "writing" && msg()) msg().textContent = "Writing up the findings"; });
+    draft.ai = mergeAI(draft.ai, res);
+    const L = draft.ai.levels;
+    clearInterval(tick); addBody.querySelector(".ladder")?.classList.remove("thinking");
+    await climb(Object.fromEntries(LEVELS.map(l => [l, L[l].conf])));
+    draft.identification.status = !draft.ai.isWatch || !L.brand.value ? "unrecognised" : L.reference.conf >= CONFIDENT ? "identified-ai" : "partial";
+    addBusy = false; addGo("result");
+  } catch (e) {
+    clearInterval(tick); addBusy = false;
+    if (e.code === "cancelled" || e.code === "aborted"){ addGo("photo"); toastAdd("Stopped. Your photos and earlier findings are kept."); return; }
+    addError = e.code; addGo("error");
+  }
 }
 async function runLink(url){
-  draft.identification.method = "link"; addBusy = true; addGo("analyzing");
+  if (!draft.identification.method) draft.identification.method = "link"; draft._linkRun = true; addBusy = true; addGo("analyzing");
   const res = readLink(url);
   const conf = Object.fromEntries(LEVELS.map(l => [l, res.fields[l] ? 1 : 0]));
   await climb(res.status === "failed" ? null : conf);
   draft.sources.push({ type:"link", url, status:res.status, extracted:res.fields, at:new Date().toISOString() });
   addBusy = false;
-  if (res.status === "failed"){ addGo("details"); toastAdd("This page couldn't be read. The link is saved with the watch; add the details yourself."); return; }
+  if (res.status === "failed"){ addGo("details"); toastAdd("Nothing could be read from this address. The link is saved with the watch; add the details yourself."); return; }
   contribute("link", res.fields);
   if (res.catalogueId) draft.catalogueId = res.catalogueId;
   addGo("details");
-  toastAdd(res.status === "parsed" ? "Read from the page. Check the details below." : "Part of the page could be read. Complete the rest below.");
+  toastAdd(res.status === "parsed" ? "Read from the link's address. Check the details below." : "The brand was read from the address. Complete the rest below.");
 }
 function toastAdd(msg){ const t = document.getElementById("addw-toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastAdd.t); toastAdd.t = setTimeout(() => t.hidden = true, 5200); }
-async function thumbOf(file){
-  const bmp = await createImageBitmap(file); const s = Math.min(1, 240 / Math.max(bmp.width, bmp.height));
-  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s); c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
-  return c.toDataURL("image/jpeg", 0.8);
+async function decodeImage(file){
+  try { return await createImageBitmap(file); }
+  catch { return await new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error("decode")); im.src = u; }); }
+}
+function toJpeg(src, max, q){
+  const w0 = src.width || src.naturalWidth, h0 = src.height || src.naturalHeight, s = Math.min(1, max / Math.max(w0, h0));
+  const c = document.createElement("canvas"); c.width = Math.round(w0 * s); c.height = Math.round(h0 * s);
+  const g = c.getContext("2d"); g.imageSmoothingQuality = "high"; g.drawImage(src, 0, 0, c.width, c.height); return c;
+}
+async function preparePhoto(file){
+  const img = await decodeImage(file);
+  const big = toJpeg(img, 2000, 0.88), blob = await new Promise((res, rej) => big.toBlob(b => b ? res(b) : rej(new Error("encode")), "image/jpeg", 0.88));
+  return { blob, thumb:toJpeg(img, 260, 0.8).toDataURL("image/jpeg", 0.8), name:file.name, w:big.width, h:big.height };
 }
 
 /* ---------- saving: the draft becomes a collection entry ---------- */
 let savedEntry = null;
-function saveDraft(){
+async function saveDraft(){
   const d = { brand:F("brand"), collection:F("collection"), model:F("model"), reference:F("reference"), variant:F("variant") };
-  const linked = draft.catalogueId ? COLLECTION.find(e => e && e.catalogueId === draft.catalogueId) : null;
+  await CLAUDE.ready;
+  const photos = []; let failed = 0;
+  for (const p of draft.photos){
+    let assetId = null;
+    if (CLAUDE.assets){ try { assetId = (await CLAUDE.assets.upload(p.blob, { type:"image/jpeg" })).id; } catch { failed++; } }
+    photos.push({ assetId, thumb:p.thumb, w:p.w, h:p.h });
+  }
+  const idx = indexMatch(d.reference);
   savedEntry = {
     id:draft.id, slot:null, catalogueId:draft.catalogueId,
     identification:{ status:draft.catalogueId ? "identified" : d.reference ? "reference-known" : "unidentified", method:draft.identification.method || "manual",
-      fields:draft.fields },
-    described:{ ...d, label:[d.model || d.collection || "Watch"].join(" "), detail:d.variant || "" },
-    sources:draft.sources,
-    // the 3D look: the catalogue model's look when known, otherwise a neutral watch until identified
-    look:linked ? JSON.parse(JSON.stringify(linked.look)) : { metal:"steel", dial:{ base:"#2b2f34", base2:"#1c1f23", sun:true, style:"baton", ind:"#e8eaee" }, band:"bracelet", hands:{ central:["h", "m", "s"] } },
+      confirmed:draft.identification.confirmed, inIndex:!!idx, fields:draft.fields,
+      ai:draft.ai ? { levels:draft.ai.levels, observations:draft.ai.observations, visibleText:draft.ai.visibleText } : null },
+    described:{ ...d, label:d.model || d.collection || "Watch", detail:d.variant || "" },
+    sources:draft.sources.map(({ photo, ...rest }) => rest),
+    photos,
+    // no invented 3D model: the collector's own photo stands in until an accurate model exists
+    look:null, visual:photos.length ? "photo" : "card",
     owned:draft.owned, private:draft.private, added:true
   };
-  COLLECTION.push(savedEntry); persistAdded();
+  COLLECTION.push(savedEntry); await persistEntry(savedEntry);
+  if (failed) toastAdd("Some photos couldn't be stored at full size. Small copies are kept with the watch.");
 }
 function finish(slot){
-  savedEntry.slot = slot; persistAdded(); closeAdd();
+  savedEntry.slot = slot; persistEntry(savedEntry); closeAdd();
   buildBox();
   if (slot != null) setTimeout(() => { const cell = cells.find(c => c.userData.slot === slot); if (cell) focusCell(cell); }, 500);
 }
-function persistAdded(){ try { localStorage.setItem("ecrin-added", JSON.stringify(COLLECTION.filter(e => e && e.added))); } catch {} }
-function restoreAdded(){ try { const a = JSON.parse(localStorage.getItem("ecrin-added") || "[]"); for (const e of a) if (!COLLECTION.some(x => x && x.id === e.id)) COLLECTION.push(e); } catch {} }
+// Added watches live in the viewer's private database when available, otherwise in this browser.
+async function persistEntry(e){
+  await CLAUDE.ready;
+  if (CLAUDE.db && CLAUDE.uid){ try { await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).doc(e.id).set(JSON.parse(JSON.stringify(e))); return; } catch (err) { console.warn(err); } }
+  try { const all = JSON.parse(localStorage.getItem("ecrin-added") || "[]").filter(x => x.id !== e.id); all.push(e); localStorage.setItem("ecrin-added", JSON.stringify(all)); } catch {}
+}
+async function restoreAdded(){
+  const add = e => { if (e && e.id && !COLLECTION.some(x => x && x.id === e.id)) COLLECTION.push(e); };
+  try { JSON.parse(localStorage.getItem("ecrin-added") || "[]").forEach(add); } catch {}
+  await Promise.race([CLAUDE.ready, new Promise(r => setTimeout(r, 4000))]);
+  if (CLAUDE.db && CLAUDE.uid){ try { (await CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get()).docs.forEach(d => add(d.data())); } catch (err) { console.warn(err); } }
+}
+const photoSrc = p => p.assetId ? "/_blob/" + p.assetId : p.thumb;
 
 /* ============ picking ============ */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
@@ -1492,7 +1712,8 @@ function loop(now){
   const ticked = tickHands(now);
   if (tweens.length && !passportOpen) renderer.shadowMap.needsUpdate = true;
   for (let i = tweens.length - 1; i >= 0; i--){ const tw = tweens[i], k = Math.min(1, (now - tw.t0) / tw.dur); tw.fn(tw.ease(k)); dirty = true; if (k >= 1) tweens.splice(i, 1); }
-  if (passportOpen && hero){ hero.ctl.update(); hero.r.render(hero.sc, hero.cam); return; }
+  if (passportOpen && hero && !hero.paused){ hero.ctl.update(); hero.r.render(hero.sc, hero.cam); return; }
+  if (passportOpen) return;
   if (controls.update() || dirty || ticked){ renderer.render(scene, camera); dirty = false; }
 }
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!state.focus) frameView(false); requestRender(); });
@@ -1503,7 +1724,7 @@ addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!addEl.hi
 /* ============ start ============ */
 async function start(){
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
-  restoreAdded(); sharedGeometries(); buildBox();
+  await restoreAdded(); sharedGeometries(); buildBox();
   frameView(false);
   renderer.compile(scene, camera);
   requestAnimationFrame(loop);
