@@ -2030,7 +2030,7 @@ async function loadCollection(){
   window.__boot && __boot.mark(`storage ready: db ${CLAUDE.db ? "yes" : "no"}, user ${CLAUDE.uid ? "yes" : "no"}`);
   let docs = [];
   if (CLAUDE.db && CLAUDE.uid){
-    try { docs = (await withTimeout(CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get(), 12000)).docs.map(d => ({ ...d.data(), id:d.data().id || d.id, _doc:d.id })); storeMode = "db"; }
+    try { docs = (await withTimeout(CLAUDE.db.collection(`data/users/${CLAUDE.uid}`).get(), 12000)).docs.map(d => { const x = JSON.parse(JSON.stringify(d.data() || {})); return { ...x, id:x.id || d.id, _doc:d.id }; }); storeMode = "db"; }
     catch (err) { console.warn(err); setTimeout(() => toastBox("Your collection couldn't be reached just now. Reload to try again."), 1600); }
   }
   window.__boot && __boot.mark(`read ${docs.length} records from ${storeMode}`);
@@ -2241,7 +2241,7 @@ function loop(now){
   if (passportOpen) return;
   if (controls.update() || dirty || ticked){ renderer.render(scene, camera); dirty = false; }
 }
-addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (!state.focus) frameView(false); requestRender(); });
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (box && !state.focus) frameView(false); requestRender(); });
 lidBtn.addEventListener("click", () => setOpen(!state.open));
 document.getElementById("b-reset").addEventListener("click", () => { if (state.focus) unfocus(true); frameView(true, 1.1); });
 addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document.getElementById("confirm").hidden) document.getElementById("confirm-no").click(); else if (moving) endMove(); else if (!collEl.hidden) closeCollection(); else if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
@@ -2256,7 +2256,7 @@ async function start(){
   try { pending = await loadCollection(); }
   catch (err) {
     console.error("load", err); pending = [];
-    if (!COLLECTION.some(e => e.placement !== undefined)){ const taken = new Set(); COLLECTION.length = 0; DEMO_SEED.forEach(d => { const e = JSON.parse(JSON.stringify(d)); legacyToPlacement(e, taken); COLLECTION.push(e); }); }
+    if (!COLLECTION.some(e => e && e.placement !== undefined)){ const taken = new Set(); COLLECTION.length = 0; DEMO_SEED.forEach(d => { const e = JSON.parse(JSON.stringify(d)); legacyToPlacement(e, taken); COLLECTION.push(e); }); }
   }
   stage("building the box"); sharedGeometries(); buildBox();
   stage("controls"); renderDock();
