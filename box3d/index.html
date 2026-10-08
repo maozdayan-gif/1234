@@ -264,6 +264,9 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 .hint-s.warn{color:#e2c08c}
 
 .veil{position:fixed;inset:0;background:var(--night);transition:opacity 1s;pointer-events:none}
+.boot{position:fixed;left:16px;right:16px;top:50%;transform:translateY(-50%);z-index:60;margin:0 auto;max-width:520px;padding:16px 18px;background:#141b1f;border:1px solid var(--rule);color:var(--ivory);font:400 14px/1.55 var(--serif)}
+.boot b{display:block;font:400 19px var(--display);color:var(--gilt);margin-bottom:6px}
+.boot pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:rgba(236,230,216,.75);user-select:text;-webkit-user-select:text}
 </style>
 
 <div id="stage"></div>
@@ -290,6 +293,16 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
   </div>
 </section>
 <div class="veil" id="veil"></div>
+<div class="boot" id="boot" hidden role="alert"><b>The box couldn't be shown</b><span>Please send this report to Claude:</span><pre id="boot-log"></pre></div>
+<script>
+// Start-up report: plain script, so it works even if the 3D module never loads.
+window.__boot = { t0:Date.now(), stage:"loading the 3D engine", errors:[] };
+function __bootShow(){ const b = document.getElementById("boot"); if (!b) return; const B = window.__boot;
+  document.getElementById("boot-log").textContent = ["stopped at: " + B.stage, "after: " + ((Date.now() - B.t0) / 1000).toFixed(1) + " s", ...B.errors.slice(0, 6), "browser: " + navigator.userAgent, "screen: " + innerWidth + "×" + innerHeight + " @" + devicePixelRatio].join("\n"); b.hidden = false; }
+addEventListener("error", e => { const B = window.__boot; B.errors.push("error: " + (e.message || (e.target && (e.target.src || e.target.href)) || "resource failed") + (e.lineno ? " (line " + e.lineno + ")" : "")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); }, true);
+addEventListener("unhandledrejection", e => { const B = window.__boot, r = e.reason; B.errors.push("rejected: " + (r && (r.code ? r.code + " " : "") + (r.message || r) || "unknown")); if (!B.done || Date.now() - B.done < 10000) __bootShow(); });
+setTimeout(() => { if (!window.__boot.done) __bootShow(); }, 30000);
+</script>
 
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
@@ -2215,21 +2228,27 @@ addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document
 
 /* ============ start ============ */
 async function start(){
+  const B = window.__boot || { errors:[] }, stage = s => { B.stage = s; };
+  stage("fonts");
   try { await Promise.race([document.fonts.load('400 64px "Bellefair"'), new Promise(r => setTimeout(r, 2000))]); } catch {}
   let pending = [];
+  stage("reading your collection");
   try { pending = await loadCollection(); }
   catch (err) {
     console.error("load", err); pending = [];
     if (!COLLECTION.some(e => e.placement !== undefined)){ const taken = new Set(); COLLECTION.length = 0; DEMO_SEED.forEach(d => { const e = JSON.parse(JSON.stringify(d)); legacyToPlacement(e, taken); COLLECTION.push(e); }); }
   }
-  sharedGeometries(); buildBox(); renderDock();
-  frameView(false);
-  renderer.compile(scene, camera);
-  requestAnimationFrame(loop);
+  stage("building the box"); sharedGeometries(); buildBox();
+  stage("controls"); renderDock();
+  stage("camera"); frameView(false);
+  stage("preparing materials"); try { renderer.compile(scene, camera); } catch (err) { B.errors.push("compile: " + (err && err.message || err)); }
+  stage("first frame"); requestAnimationFrame(loop);
   document.getElementById("veil").style.opacity = 0;
+  B.done = Date.now(); stage("done");
+  renderer.domElement.addEventListener("webglcontextlost", () => { B.errors.push("the graphics context was lost (device memory)"); stage("drawing"); __bootShow(); });
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
   if (pending.length) setTimeout(() => persistMigration(pending), 1500);
   window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, BOX, switchTray, startMove, moveTo, placeInBox, removeFromBox, deleteWatch, confirmDelete, openEdit, openCollection, showWatch, planPlacement, isPlaced, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
-start();
+start().catch(err => { const B = window.__boot; if (B){ B.errors.push("start: " + (err && (err.stack || err.message) || err)); __bootShow(); } console.error(err); });
 </script>
