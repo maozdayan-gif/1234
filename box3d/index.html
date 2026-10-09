@@ -273,6 +273,30 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 .gal-add:hover{background:#e2d9c6}
 .gal-add input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .gal-busy{margin:10px 0 0;font-size:14px;color:var(--ink-soft)}
+.align .addw-panel{width:min(720px,100%)}
+.al-tabs{display:flex;gap:8px}.al-tabs button{flex:1;font:400 14px var(--serif);color:var(--mute);background:none;border:1px solid var(--rule);padding:9px 8px;cursor:pointer}
+.al-tabs button[aria-pressed="true"]{color:var(--ivory);border-color:var(--gilt);background:rgba(180,147,90,.12)}
+.al-stage{position:relative;align-self:center;max-width:100%;line-height:0;touch-action:none;user-select:none;-webkit-user-select:none}
+.al-stage img{max-width:100%;max-height:56vh;display:block}
+.al-stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.al-stage .ring{fill:none;stroke:#e6c98a;stroke-width:2;vector-effect:non-scaling-stroke}
+.al-stage .ring2{fill:none;stroke:rgba(0,0,0,.6);stroke-width:4;vector-effect:non-scaling-stroke}
+.al-stage .hd{fill:#e6c98a;stroke:#15120c;stroke-width:2;vector-effect:non-scaling-stroke;cursor:grab}
+.al-stage .tip{fill:#e2a08c;stroke:#15120c;stroke-width:2;vector-effect:non-scaling-stroke}
+.al-stage .tipl{stroke:#e2a08c;stroke-width:2;stroke-dasharray:5 4;vector-effect:non-scaling-stroke}
+.al-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;color:var(--mute)}
+.seg2{display:flex;border:1px solid var(--rule)}.seg2 button{font:400 13.5px var(--serif);color:var(--mute);background:none;border:0;padding:8px 12px;cursor:pointer}
+.seg2 button[aria-pressed="true"]{background:var(--gilt);color:#15120c}
+.al-prev{margin:0;display:grid;justify-items:center;gap:6px}.al-prev canvas{width:200px;height:200px;border-radius:50%;background:#000;box-shadow:0 0 0 1px var(--rule)}
+.al-prev figcaption{font-size:13px;color:var(--mute)}
+.gal .gb2{display:flex;gap:6px}.gal .gb2 button{flex:1;font:600 10.5px var(--sc);letter-spacing:.14em;font-variant:small-caps;color:var(--gilt-d);background:none;border:1px dashed var(--hair);padding:5px 2px;cursor:pointer}
+.gal .gb2 button.on{border-style:solid;border-color:#8d7547;color:var(--ink)}
+.gal .badge.b2{left:auto;right:6px}
+.model3d{display:grid;gap:10px;margin:0 0 22px;padding:16px 18px;background:var(--paper-2);border-left:2px solid #b4935a}
+.model3d p{margin:0;font-size:15px;line-height:1.55}.model3d .acts2{display:flex;flex-wrap:wrap;gap:8px}
+.model3d button{font:400 14px var(--serif);color:var(--ink);background:none;border:1px solid #8d7547;padding:8px 14px;cursor:pointer}
+.model3d button.pri3{background:#1d1c19;color:#f1ece1;border-color:#1d1c19}
+.model3d button:disabled{opacity:.45;cursor:default}
 .gal-tip{margin:14px 0 0;font-size:14px;line-height:1.55;color:var(--ink-soft);max-width:62ch}
 
 .diag pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:rgba(236,230,216,.8)}
@@ -295,11 +319,19 @@ body{margin:0;overflow:hidden;font-family:var(--serif);-webkit-font-smoothing:an
 <div class="dissolve" id="dissolve" hidden></div>
 <article class="passport" id="passport" hidden aria-label="Watch passport">
   <div class="pp-top"><button id="pp-back">← The box</button><div class="seg" role="group" aria-label="View as"><button data-viewer="owner" aria-pressed="true">Owner</button><button data-viewer="visitor">Visitor</button></div></div>
-  <div class="pp-hero"><canvas id="hero-canvas"></canvas><div class="hero-photos" id="hero-photos" hidden></div><div class="hero-views"><button data-hero="dial">Dial</button><button data-hero="three" aria-pressed="true">Three-quarter</button><button data-hero="profile">Profile</button></div></div>
+  <div class="pp-hero"><canvas id="hero-canvas"></canvas><div class="hero-photos" id="hero-photos" hidden></div><div class="hero-views"><button data-hero="dial">Dial</button><button data-hero="three" aria-pressed="true">Three-quarter</button><button data-hero="profile">Profile</button><button data-hero="back" hidden>Caseback</button></div></div>
   <p class="demo-note" id="demo-note">Demo collection · ownership details are examples</p>
   <div class="pp-body" id="pp-body"></div>
 </article>
 <section class="addw coll" id="coll" hidden role="dialog" aria-modal="true" aria-label="Collection"><div class="addw-panel"><header class="addw-head"><span></span><h2>Collection</h2><button id="coll-close" aria-label="Close">✕</button></header><div class="addw-body" id="coll-body"></div></div></section>
+<section class="addw align" id="align" hidden role="dialog" aria-modal="true" aria-labelledby="al-title"><div class="addw-panel"><header class="addw-head"><button id="al-cancel">Cancel</button><h2 id="al-title">Fit the dial</h2><button id="al-save">Save</button></header><div class="addw-body" id="al-body">
+  <div class="al-tabs" role="tablist"><button data-al="ring" aria-pressed="true">1 · Fit the ring</button><button data-al="tips" id="al-tab-tips">2 · Mark the hands</button></div>
+  <p class="hint-s" id="al-help"></p>
+  <div class="al-stage" id="al-stage"><img id="al-img" alt=""><svg id="al-svg" preserveAspectRatio="none"></svg></div>
+  <div class="al-row" id="al-hands"><span>Hands on this watch</span><div class="seg2"><button data-hands="live" aria-pressed="true">Live · real time</button><button data-hands="photo">From the photo</button></div></div>
+  <div class="al-row"><button class="sec small" id="al-undo">Undo last tip</button><button class="sec small" id="al-reset">Reset ring</button></div>
+  <figure class="al-prev"><canvas id="al-prev" width="240" height="240"></canvas><figcaption>Preview of the straightened <span id="al-what">dial</span></figcaption></figure>
+</div></div></section>
 <section class="addw confirm" id="confirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="confirm-h"><div class="addw-panel"><div class="addw-body"><h2 id="confirm-h"></h2><p></p><div class="acts col"><button class="pri danger-btn" id="confirm-yes">Delete permanently</button><button class="sec" id="confirm-no">Keep the watch</button></div></div></div></section>
 <section class="addw" id="addw" hidden role="dialog" aria-modal="true" aria-labelledby="addw-title">
   <div class="addw-panel">
@@ -767,7 +799,7 @@ function tickHands(now){
   if (now - lastTick < 125) return false;
   lastTick = now; const d = new Date();
   if (d.getDate() !== lastDay){ lastDay = d.getDate(); for (const dd of dateDials){ dd.mat.map = tex(dialCanvas(dd.look.dial, lastDay)); dd.mat.needsUpdate = true; } }
-  for (const set of liveWatches) setHands(set, d);
+  for (const set of liveWatches) set.engine ? ENG.setTime(set.engine) : setHands(set, d);
   return liveWatches.size > 0;
 }
 
@@ -1002,7 +1034,7 @@ function buildBox(){
       const worn = new THREE.Group(); worn.rotation.x = WATCH_TILT; cushion.add(worn);
       worn.add(buildBand(w));
       head = buildWatch(w); liveWatches.add(head.userData.hands); boxHandSets.push(head.userData.hands); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
-    } else if (entry){ head = buildStandIn(entry); cushion.add(head); }
+    } else if (entry){ head = entry.spec && ENG ? buildEngineHead(entry) : buildStandIn(entry); cushion.add(head); }
     cell.userData = { slot:i, pos:{ tray:activeTray, row:r, col:c }, watch:w || (entry ? { standIn:true } : null), entry, head, cushion };
     box.add(cell); cells.push(cell);
   }
@@ -1028,6 +1060,102 @@ function buildBox(){
   requestRender(true);
 }
 
+
+/* =====================================================================
+   PARAMETRIC WATCH ENGINE (watchEngine.js, from the owner's own watch app) — a real 3D watch built from a spec
+   (case, bezel, dial, hands, strap), optionally carrying the owner's photographs of the real dial and caseback.
+   Loaded on its own, so the box always works even if it fails to load. Units in the engine are millimetres.
+   ===================================================================== */
+let ENG = null;
+const engineReady = import("./watchEngine.js").then(m => { ENG = m; window.__boot && __boot.mark("watch engine loaded"); return m; })
+  .catch(err => { console.warn("watch engine", err); window.__boot && (__boot.errors.push("engine: " + (err && err.message || err)), __boot.mark("watch engine failed")); return null; });
+const ENG_SCALE = (CUSH_R + 0.14) / 26;          // its wrist radius (26 mm) onto our cushion
+const discCache = new Map();                      // photo-derived dial/back canvases, by record id + settings
+function engineWatch(e){
+  const opts = {}, d = e.dialPhoto, b = e.backPhoto;
+  if (d && discCache.has(e.id + ":dial")){ opts.dialImage = discCache.get(e.id + ":dial"); opts.photoHands = d.hands === "photo"; }
+  if (b && discCache.has(e.id + ":back")) opts.backImage = discCache.get(e.id + ":back");
+  const w = ENG.buildWatch(e.spec, ENG.movementOf({ model:e.spec }), opts);
+  w.root.traverse(o => { if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
+  w.root.scale.setScalar(ENG_SCALE); w.root.rotation.x = -Math.PI / 2;   // dial up, 12 o'clock toward the back of the box
+  if (opts.photoHands) w.frozen = true;
+  return w;
+}
+// The record's photographs of the dial / caseback, straightened into discs (see the alignment tool). Async; the
+// watch is rebuilt once they are ready.
+async function prepareDiscs(e){
+  const jobs = [];
+  for (const [kind, set] of [["dial", e.dialPhoto], ["back", e.backPhoto]]){
+    if (!set || discCache.has(e.id + ":" + kind)) continue;
+    const ph = (e.photos || [])[set.photo]; if (!ph) continue;
+    jobs.push((async () => {
+      for (const src of [ph.assetId ? "/_blob/" + ph.assetId : null, ph.thumb].filter(Boolean)){
+        try { discCache.set(e.id + ":" + kind, straightenDisc(await loadImage(src), set, kind === "dial" && set.hands !== "photo")); return true; } catch {}
+      }
+      return false;
+    })());
+  }
+  return (await Promise.all(jobs)).some(Boolean);
+}
+// Photo → disc: the ellipse the owner fitted to the dial (or caseback) edge becomes a circle filling a square
+// canvas. With eraseHands, the photo's own hands (marked by their tips) are painted out, so live hands can be drawn.
+const DISC = 1024;
+function discTransform(set, iw, ih){
+  const cx = set.cx * iw, cy = set.cy * ih, rx = set.rx * iw, ry = set.ry * iw, rot = set.rot || 0;
+  // photo point → disc point (disc centre DISC/2, radius DISC/2)
+  const c = Math.cos(-rot), sn = Math.sin(-rot), k = DISC / 2;
+  return (x, y) => { const dx = x - cx, dy = y - cy, u = dx * c - dy * sn, v = dx * sn + dy * c; return [k + u / rx * k, k + v / ry * k]; };
+}
+function straightenDisc(img, set, eraseHands){
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const cv = document.createElement("canvas"); cv.width = cv.height = DISC; const g = cv.getContext("2d", { willReadFrequently:true });
+  g.beginPath(); g.arc(DISC / 2, DISC / 2, DISC / 2, 0, Math.PI * 2); g.clip();
+  g.translate(DISC / 2, DISC / 2); g.scale((DISC / 2) / (set.rx * iw), (DISC / 2) / (set.ry * iw)); g.rotate(-(set.rot || 0)); g.translate(-set.cx * iw, -set.cy * ih);
+  g.imageSmoothingQuality = "high"; g.drawImage(img, 0, 0);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  if (eraseHands && set.tips && set.tips.length){ const T = discTransform(set, iw, ih); eraseHandsOn(g, set.tips.map(([x, y]) => T(x * iw, y * ih))); }
+  return cv;
+}
+// Paints each hand out like a clone stamp: the hand's strip is replaced by the strip of dial right beside it (on
+// whichever side is clear of the other hands), blended at the edges; the hub is filled from the ring around it.
+function eraseHandsOn(g, tips){
+  const S = DISC, C = S / 2, id = g.getImageData(0, 0, S, S), src = new Uint8ClampedArray(id.data), d = id.data;
+  const widths = [0.06, 0.045, 0.018];
+  const hands = tips.map(([x, y], k) => { const dx = x - C, dy = y - C, L = Math.hypot(dx, dy) || 1; return { ux:dx / L, uy:dy / L, L:L * 1.05, tail:L * (k === 2 ? 0.3 : 0.17), w:widths[Math.min(k, 2)] * C }; });
+  const hub = C * 0.06, feather = C * 0.012;
+  const bandOf = (h, x, y) => { const dx = x - C, dy = y - C, t = dx * h.ux + dy * h.uy, n = -dx * h.uy + dy * h.ux; return { t, n, inside:t > -h.tail && t < h.L && Math.abs(n) < h.w }; };
+  const blocked = (x, y, self) => { const dx = x - C, dy = y - C; if (dx * dx + dy * dy < hub * hub) return true; return hands.some(h => h !== self && bandOf(h, x, y).inside); };
+  const px = (x, y) => { const xi = Math.min(S - 1, Math.max(0, Math.round(x))), yi = Math.min(S - 1, Math.max(0, Math.round(y))); return (yi * S + xi) * 4; };
+  for (const h of hands){
+    // pick the side whose neighbouring strip touches neither another hand nor the hub (checked along the hand)
+    const off = h.w * 2.15, nx = -h.uy, ny = h.ux;
+    let side = 1, best = -1;
+    for (const sg of [1, -1]){ let clear = 0; for (let t = -h.tail; t < h.L; t += 6){ const x = C + h.ux * t + nx * sg * off, y = C + h.uy * t + ny * sg * off; if (!blocked(x, y, h)) clear++; } if (clear > best){ best = clear; side = sg; } }
+    const x0 = Math.max(0, Math.floor(C + Math.min(h.ux * h.L, -h.ux * h.tail) - h.w - feather - 2)), x1 = Math.min(S - 1, Math.ceil(C + Math.max(h.ux * h.L, -h.ux * h.tail) + h.w + feather + 2));
+    const y0 = Math.max(0, Math.floor(C + Math.min(h.uy * h.L, -h.uy * h.tail) - h.w - feather - 2)), y1 = Math.min(S - 1, Math.ceil(C + Math.max(h.uy * h.L, -h.uy * h.tail) + h.w + feather + 2));
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++){
+      const b = bandOf(h, x, y); if (b.t <= -h.tail - feather || b.t >= h.L + feather) continue;
+      const edge = Math.abs(b.n) - h.w; if (edge > feather) continue;
+      const a = edge <= 0 ? 1 : 1 - edge / feather;
+      const i = (y * S + x) * 4, j = px(x + nx * side * off, y + ny * side * off);
+      for (let c = 0; c < 3; c++) d[i + c] = d[i + c] * (1 - a) + src[j + c] * a;
+    }
+  }
+  // hub: copy the ring just outside it, rotated
+  for (let y = Math.floor(C - hub - 2); y <= C + hub + 2; y++) for (let x = Math.floor(C - hub - 2); x <= C + hub + 2; x++){
+    const dx = x - C, dy = y - C, r = Math.hypot(dx, dy); if (r > hub + feather) continue;
+    const a = r <= hub ? 1 : 1 - (r - hub) / feather, ang = Math.atan2(dy, dx), rr = hub + feather * 2 + (hub - Math.min(r, hub)) * 0.6;
+    const i = (y * S + x) * 4, j = px(C + Math.cos(ang + 0.5) * rr, C + Math.sin(ang + 0.5) * rr);
+    for (let c = 0; c < 3; c++) d[i + c] = d[i + c] * (1 - a) + d[j + c] * a;
+  }
+  g.putImageData(id, 0, 0);
+}
+function buildEngineHead(e){
+  const grp = new THREE.Group(), w = engineWatch(e); grp.add(w.root);
+  grp.userData.engine = w; grp.userData.kind = "engine";
+  if (!w.frozen){ const set = { engine:w.hands }; liveWatches.add(set); boxHandSets.push(set); }
+  return grp;
+}
 
 /* =====================================================================
    PHOTO-WRAPPED WATCH (experiment, option B)
@@ -1301,16 +1429,31 @@ function ensureHero(){
   new ResizeObserver(hero.size).observe(canvasEl.parentElement);
   return hero;
 }
-const HERO_VIEWS = { dial:[16, 0], three:[52, 35], profile:[84, 90] };
+const HERO_VIEWS = { dial:[16, 0], three:[52, 35], profile:[84, 90], back:[166, 25] };
 function heroView(name, dur = 1.2){
   const h = hero, [pol, az] = HERO_VIEWS[name], t = new THREE.Vector3(0, 0.8, 0);
   const s0 = new THREE.Spherical().setFromVector3(h.cam.position.clone().sub(h.ctl.target)), s1 = new THREE.Spherical(h.cam.aspect < 0.9 ? 27 : 18, THREE.MathUtils.degToRad(pol), THREE.MathUtils.degToRad(az));
   h.ctl.autoRotate = false;
+  if (h.engine) ENG.setStrapVisible(h.engine, name !== "back");     // the strap would hide the caseback
   tween(dur, easeInOut, k => { h.ctl.target.lerp(t, k); h.cam.position.setFromSpherical(new THREE.Spherical(THREE.MathUtils.lerp(s0.radius, s1.radius, k), THREE.MathUtils.lerp(s0.phi, s1.phi, k), THREE.MathUtils.lerp(s0.theta, s1.theta, k))).add(h.ctl.target); });
   document.querySelectorAll("[data-hero]").forEach(b => b.setAttribute("aria-pressed", b.dataset.hero === name));
 }
 function heroShow(entry, fromBox){
   const hp = document.getElementById("hero-photos"), cv = document.getElementById("hero-canvas"), hv = document.querySelector(".hero-views");
+  if (entry.spec && ENG){
+    cv.hidden = false; hv.hidden = false; hp.hidden = true;
+    const h = ensureHero(); h.size(); h.paused = false;
+    if (h.obj){ h.sc.remove(h.obj); liveWatches.delete(h.set); }
+    const w = engineWatch(entry), g = new THREE.Group(); g.add(w.root); h.engine = w;
+    hv.querySelector('[data-hero="back"]').hidden = false;
+    g.position.y = -(CUSH_R + 0.14) + 0.4; h.sc.add(g); h.obj = g;
+    h.set = w.frozen ? null : { engine:w.hands }; if (h.set) liveWatches.add(h.set);
+    h.ctl.target.set(0, 0.8, 0);
+    h.cam.position.setFromSpherical(new THREE.Spherical(fromBox ? 7.5 : 18, THREE.MathUtils.degToRad(10), 0)).add(h.ctl.target);
+    h.ctl.autoRotate = false; heroView("three", fromBox ? 1.8 : 0.01);
+    setTimeout(() => { if (!reduceMotion) h.ctl.autoRotate = true; }, 2200);
+    return;
+  }
   if (entry.visual){
     // no accurate 3D model: the collector's own photographs are the hero
     cv.hidden = true; hv.hidden = true; hp.hidden = false;
@@ -1322,7 +1465,7 @@ function heroShow(entry, fromBox){
     return;
   }
   cv.hidden = false; hv.hidden = false; hp.hidden = true;
-  const h = ensureHero(); h.size(); h.paused = false;
+  const h = ensureHero(); h.size(); h.paused = false; h.engine = null; hv.querySelector('[data-hero="back"]').hidden = true;
   if (h.obj){ h.sc.remove(h.obj); liveWatches.delete(h.set); }
   // the watch as if on a wrist: its band closed in a loop, the head on top, presented dial-up
   const g = new THREE.Group(); g.add(buildBand(entry.look));
@@ -2266,6 +2409,143 @@ document.getElementById("pp-body").addEventListener("click", ev => {
   else if (act === "delete") confirmDelete(e);
 });
 /* ---------- gallery: the owner's photographs of this watch; the box model is built from them ---------- */
+function model3dBlock(raw){
+  const busy = specBusy === raw.id;
+  if (!raw.spec) return `<div class="model3d"><p><b>3D model.</b> Claude can build a real 3D model of this watch from your photographs and its identification: case, bezel, dial, hands and strap, with the hands showing the real time. You can then lay your own photograph of the dial and caseback onto it for the exact details.</p>
+    <div class="acts2"><button class="pri3" data-gal="spec" ${busy ? "disabled" : ""}>${busy ? "Building the model…" : "Build the 3D model"}</button></div></div>`;
+  const d = raw.dialPhoto, b = raw.backPhoto;
+  return `<div class="model3d"><p><b>3D model.</b> Shown in the box and at the top of this page. ${d ? `Dial: from photograph ${d.photo + 1}, ${d.hands === "photo" ? "with the photograph's own hands (fixed time)" : "with live hands"}.` : "Dial: drawn. Choose <i>Dial</i> under the most frontal photograph to use the real one."} ${b ? `Caseback: from photograph ${b.photo + 1}.` : ""}</p>
+    <p class="hint-s" style="color:var(--ink-soft)">Illustrative model. ${raw.spec.__note ? esc(raw.spec.__note) : ""}</p>
+    <div class="acts2"><button data-gal="spec" ${busy ? "disabled" : ""}>${busy ? "Rebuilding…" : "Rebuild from photographs"}</button>${d ? `<button data-gal="dial" data-k="${d.photo}">Adjust the dial</button>` : ""}${b ? `<button data-gal="back" data-k="${b.photo}">Adjust the caseback</button>` : ""}<button data-gal="nospec">Remove the 3D model</button></div></div>`;
+}
+// Keeps dial/caseback photo references right when photos are removed or reordered.
+function reindexPhotoRefs(e, map){
+  for (const key of ["dialPhoto", "backPhoto"]){ const set = e[key]; if (!set) continue; const n = map(set.photo); if (n == null) delete e[key]; else set.photo = n; discCache.delete(e.id + ":" + (key === "dialPhoto" ? "dial" : "back")); }
+}
+async function refreshModel(e){ discCache.delete(e.id + ":dial"); discCache.delete(e.id + ":back"); await engineReady; await prepareDiscs(e); if (passportOpen && passportEntry === e){ heroShow(e, false); } if (isPlaced(e)) boxStale = true; }
+
+/* ---------- 3D spec from photographs (Claude) ---------- */
+let specBusy = null;
+const SPEC_SHAPE = `{"movementType":"automatic|manual|quartz","caseShape":"round|cushion|square|tonneau|octagon|rounded-octagon","caseDiameterMm":42,"caseThicknessMm":12,"lugToLugMm":50,"caseMaterial":"steel|titanium|gold|rose-gold|bronze|ceramic|bioceramic|plastic|carbon","caseColor":"#rrggbb","caseFinish":"polished|brushed|matte",
+"bezel":{"type":"none|smooth|fluted|tachymeter|dive|gmt","color":"#rrggbb","insertColor":"#rrggbb","insertColor2":"#rrggbb","textColor":"#rrggbb","screws":false,"screwCount":6,"screwColor":"#rrggbb"},
+"dial":{"color":"#rrggbb","finish":"sunburst|matte|gloss|guilloche|lacquer|tapisserie|aquanaut|skeleton|globe","indexStyle":"baton|applied|arabic|roman|dots|mixed|even-arabic|none","indexColor":"#rrggbb","lumeColor":"#rrggbb","trackColor":"#rrggbb","accentColor":"#rrggbb"},
+"subdials":{"layout":"none or clock positions joined by '-' from 3/6/9/12, e.g. 3-9","color":"#rrggbb","ringColor":"#rrggbb"},"dateWindow":"none|3|4.5|6",
+"hands":{"style":"baton|sword|dauphine|leaf|alpha|syringe","color":"#rrggbb","secondsColor":"#rrggbb","lume":true},"crown":{"guards":false,"pushers":false},
+"strap":{"type":"leather|rubber|nato|velcro|bracelet|fabric|integrated","color":"#rrggbb","stitchColor":"#rrggbb","stripes":[]},"note":"one short sentence: what this parametric model cannot show of the real watch"}`;
+function specPrompt(e, nPhotos){
+  const d = e.described || {};
+  return `You are building a parametric 3D description of ONE wristwatch owned by a collector, for a renderer that draws: case outline, bezel (optionally with screws), a printed dial, subdials, date window, hands, crown/pushers and strap.
+Watch: ${[d.brand, d.collection, d.model, d.reference, d.variant].filter(Boolean).join(" · ") || "unknown"}.
+${nPhotos ? `${nPhotos} photograph(s) of the actual watch are attached. Trust them over general knowledge for colours, dial layout, subdial positions, date window (only if visible), bezel screws, strap type.` : "No photograph is attached: use your knowledge of this exact model; when unsure, choose the plainest option."}
+Rules: colours are "#rrggbb" sampled to match the real watch (black ceramic is not pure black: about #18181a). Sizes in millimetres from the brand's specification when you know it. dateWindow "none" unless the watch really shows a date window. subdials.layout "none" when there are no subdials. Never invent decorations.
+Reply with JSON only, exactly this shape (pick one value where options are listed with |):
+${SPEC_SHAPE}`;
+}
+async function buildSpec(e){
+  await CLAUDE.ready;
+  if (!CLAUDE.sample){ toastBox("Building the model needs Claude, which isn't available in this view."); return; }
+  specBusy = e.id; renderPassport();
+  try {
+    let images = [];
+    const caps = await CLAUDE.sample.limits().catch(() => null);
+    if (caps && caps.images){
+      const max = Math.min(4, caps.images.maxCount || 1);
+      for (const ph of (e.photos || []).slice(0, max)){
+        try { const im = await loadImage(ph.assetId ? "/_blob/" + ph.assetId : ph.thumb); const c = toJpeg(im, 1024, 0.85); images.push(await new Promise(r => c.toBlob(r, "image/jpeg", 0.85))); } catch {}
+      }
+    }
+    const raw = await CLAUDE.sample.json(specPrompt(e, images.length), images.length ? { images, modelTier:"complex" } : { modelTier:"complex" });
+    if (!raw || typeof raw !== "object" || !raw.caseShape) throw new Error("no spec");
+    const spec = ENG ? ENG.cleanSpec(raw) : raw;
+    if (raw.subdials && /none/i.test(raw.subdials.layout || "")) delete spec.subdials;
+    spec.__note = typeof raw.note === "string" ? raw.note.slice(0, 200) : "";
+    spec.__from = images.length ? "photos" : "identification";
+    e.spec = JSON.parse(JSON.stringify(raw)); e.spec.__note = spec.__note; e.spec.__from = spec.__from; delete e.spec.note; if (e.spec.subdials && /none/i.test(e.spec.subdials.layout || "")) delete e.spec.subdials;
+    await saveDoc(e.id, e); await refreshModel(e);
+    toastBox(images.length ? "3D model built from your photographs." : "3D model built from the identification (photographs couldn't be sent).");
+  } catch (err) { console.warn("spec", err); toastBox("The model couldn't be built. Try again in a moment."); }
+  finally { specBusy = null; renderPassport(); }
+}
+
+/* ---------- alignment: fit the dial / caseback ring on a photograph, mark the hands ---------- */
+const alEl = document.getElementById("align"), alImg = document.getElementById("al-img"), alSvg = document.getElementById("al-svg");
+let AL = null;   // { e, kind, k, set, mode, iw, ih }
+async function openAlign(e, k, kind){
+  const ph = e.photos[k]; if (!ph) return;
+  const cur = kind === "dial" ? e.dialPhoto : e.backPhoto;
+  const set = cur && cur.photo === k ? JSON.parse(JSON.stringify(cur)) : { photo:k, cx:0.5, cy:0.5, rx:0.3, ry:0.3, rot:0, hands:"live", tips:[] };
+  if (kind === "back"){ delete set.hands; delete set.tips; }
+  AL = { e, kind, k, set, mode:"ring" };
+  document.getElementById("al-title").textContent = kind === "dial" ? "Fit the dial" : "Fit the caseback";
+  document.getElementById("al-what").textContent = kind === "dial" ? "dial" : "caseback";
+  document.getElementById("al-hands").hidden = kind !== "dial"; document.getElementById("al-tab-tips").hidden = kind !== "dial"; document.getElementById("al-undo").hidden = kind !== "dial";
+  alImg.src = ph.assetId ? "/_blob/" + ph.assetId : ph.thumb;
+  try { await alImg.decode(); } catch { alImg.src = ph.thumb; try { await alImg.decode(); } catch {} }
+  AL.iw = alImg.naturalWidth; AL.ih = alImg.naturalHeight;
+  alSvg.setAttribute("viewBox", `0 0 ${AL.iw} ${AL.ih}`);
+  if (!cur || cur.photo !== k){ set.rx = 0.3; set.ry = 0.3 * Math.min(1, AL.ih / AL.iw); }
+  alEl.hidden = false; requestAnimationFrame(() => alEl.classList.add("on"));
+  alMode("ring"); alDraw();
+}
+function alMode(m){
+  AL.mode = m; document.querySelectorAll("[data-al]").forEach(b => b.setAttribute("aria-pressed", b.dataset.al === m));
+  document.getElementById("al-help").textContent = m === "ring" ? `Drag the ring onto the edge of the ${AL.kind === "dial" ? "dial (the inner edge of the bezel)" : "caseback window"}. Middle dot: move. The two outer dots: size and tilt, one for each direction, so it can follow a dial seen at an angle.`
+    : AL.set.hands === "photo" ? "The photograph's own hands are kept, so there is nothing to mark." : "Tap the tip of the hour hand, then the minute hand, then the seconds hand (optional). They are painted out, and live hands are drawn instead.";
+}
+function alPts(){
+  const { cx, cy, rx, ry, rot } = AL.set, W = AL.iw, H = AL.ih;
+  const c = [cx * W, cy * H], a = [c[0] + Math.cos(rot) * rx * W, c[1] + Math.sin(rot) * rx * W], b = [c[0] - Math.sin(rot) * ry * W, c[1] + Math.cos(rot) * ry * W];
+  return { c, a, b };
+}
+function alDraw(){
+  const { c, a, b } = alPts(), S = AL.set, W = AL.iw, H = AL.ih, deg = (S.rot || 0) * 180 / Math.PI;
+  const R = Math.max(W, H) * 0.012;
+  const tips = (S.tips || []).map(([x, y], i) => `<line class="tipl" x1="${c[0]}" y1="${c[1]}" x2="${x * W}" y2="${y * H}"/><circle class="tip" cx="${x * W}" cy="${y * H}" r="${R * 0.8}"/>`).join("");
+  alSvg.innerHTML = `<ellipse class="ring2" cx="${c[0]}" cy="${c[1]}" rx="${S.rx * W}" ry="${S.ry * W}" transform="rotate(${deg} ${c[0]} ${c[1]})"/><ellipse class="ring" cx="${c[0]}" cy="${c[1]}" rx="${S.rx * W}" ry="${S.ry * W}" transform="rotate(${deg} ${c[0]} ${c[1]})"/>
+    ${AL.kind === "dial" && S.hands !== "photo" ? tips : ""}
+    ${AL.mode === "ring" ? `<circle class="hd" data-h="c" cx="${c[0]}" cy="${c[1]}" r="${R}"/><circle class="hd" data-h="a" cx="${a[0]}" cy="${a[1]}" r="${R}"/><circle class="hd" data-h="b" cx="${b[0]}" cy="${b[1]}" r="${R}"/>` : ""}`;
+  document.querySelectorAll("[data-hands]").forEach(x => x.setAttribute("aria-pressed", x.dataset.hands === (S.hands || "live")));
+  clearTimeout(alDraw.t); alDraw.t = setTimeout(alPreview, 180);
+}
+function alPreview(){
+  if (!AL) return; const pv = document.getElementById("al-prev"), g = pv.getContext("2d");
+  try { const disc = straightenDisc(alImg, AL.set, AL.kind === "dial" && AL.set.hands !== "photo"); g.clearRect(0, 0, 240, 240); g.drawImage(disc, 0, 0, 240, 240); } catch (err) { console.warn(err); }
+}
+const alPoint = ev => { const pt = alSvg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; const p = pt.matrixTransform(alSvg.getScreenCTM().inverse()); return [p.x, p.y]; };
+let alDrag = null;
+alSvg.addEventListener("pointerdown", ev => {
+  if (!AL) return; ev.preventDefault();
+  const h = ev.target.closest("[data-h]");
+  if (AL.mode === "ring" && h){ alDrag = h.dataset.h; alSvg.setPointerCapture(ev.pointerId); return; }
+  if (AL.mode === "tips" && AL.kind === "dial" && AL.set.hands !== "photo"){
+    const [x, y] = alPoint(ev); AL.set.tips = (AL.set.tips || []).slice(0, 2); AL.set.tips.push([x / AL.iw, y / AL.ih]); alDraw();
+  }
+});
+alSvg.addEventListener("pointermove", ev => {
+  if (!alDrag || !AL) return; const [x, y] = alPoint(ev), S = AL.set, W = AL.iw, H = AL.ih;
+  if (alDrag === "c"){ const dx = x / W - S.cx, dy = y / H - S.cy; S.cx += dx; S.cy += dy; S.tips = (S.tips || []).map(([tx, ty]) => [tx + dx, ty + dy]); }
+  else if (alDrag === "a"){ const dx = x - S.cx * W, dy = y - S.cy * H; S.rx = Math.max(0.02, Math.hypot(dx, dy) / W); S.rot = Math.atan2(dy, dx); }
+  else { const dx = x - S.cx * W, dy = y - S.cy * H; S.ry = Math.max(0.02, Math.abs(-dx * Math.sin(S.rot) + dy * Math.cos(S.rot)) / W); }
+  alDraw();
+});
+alSvg.addEventListener("pointerup", () => { alDrag = null; });
+document.querySelectorAll("[data-al]").forEach(b => b.addEventListener("click", () => { alMode(b.dataset.al); alDraw(); }));
+document.querySelectorAll("[data-hands]").forEach(b => b.addEventListener("click", () => { AL.set.hands = b.dataset.hands; alMode(AL.mode); alDraw(); }));
+document.getElementById("al-undo").addEventListener("click", () => { if (AL && AL.set.tips){ AL.set.tips.pop(); alDraw(); } });
+document.getElementById("al-reset").addEventListener("click", () => { if (!AL) return; Object.assign(AL.set, { cx:0.5, cy:0.5, rx:0.3, ry:0.3 * Math.min(1, AL.ih / AL.iw), rot:0, tips:[] }); alDraw(); });
+function closeAlign(){ alEl.classList.remove("on"); setTimeout(() => { alEl.hidden = true; }, 300); AL = null; }
+document.getElementById("al-cancel").addEventListener("click", closeAlign);
+document.getElementById("al-save").addEventListener("click", async () => {
+  if (!AL) return; const { e, kind, set } = AL;
+  const round = x => Math.round(x * 10000) / 10000;
+  const clean = { photo:set.photo, cx:round(set.cx), cy:round(set.cy), rx:round(set.rx), ry:round(set.ry), rot:round(set.rot || 0) };
+  if (kind === "dial"){ clean.hands = set.hands || "live"; clean.tips = (set.tips || []).map(([x, y]) => [round(x), round(y)]); }
+  e[kind === "dial" ? "dialPhoto" : "backPhoto"] = clean;
+  closeAlign();
+  await saveDoc(e.id, e); await refreshModel(e); renderPassport();
+  toastBox(e.spec ? (kind === "dial" ? "Dial saved. It's on the 3D model now." : "Caseback saved. Turn the model over to see it.") : "Saved. Build the 3D model to see it.");
+});
+
 // The box shows the first photo that cuts out cleanly (straight-on, plain background). Same rules as buildStandIn.
 async function boxPhotoIndex(e){
   if (e.look) return -2;                                           // a catalogue watch with its own 3D model
@@ -2287,9 +2567,11 @@ let galleryBusy = "", boxStale = false;
 function gallerySection(raw){
   const ph = raw.photos || [];
   return `<section class="sec" id="gallery"><header><span class="sc">VII</span><h2>Gallery</h2><p class="src">Only you can see this section.</p></header><div class="body">
-    ${raw.look ? `<p class="gal-state">This watch is shown in the box by its own 3D model. Your photographs are kept here.</p>` : `<p class="gal-state" id="gal-state">${ph.length ? "Checking which photograph can stand in for the watch in the box…" : "No photographs yet. Add some and the watch in the box is built from them."}</p>`}
-    ${ph.length ? `<ul class="gal">${ph.map((p, k) => `<li><button class="ph" data-gal="view" data-k="${k}" aria-label="Show photograph ${k + 1}"><img src="${photoSrc(p)}" data-thumb="${p.thumb || ""}" alt="" loading="lazy"><span class="badge" data-badge="${k}" hidden>In the box</span></button>
-      <div class="gb">${raw.look ? "" : `<button data-gal="cover" data-k="${k}" ${k === 0 ? "disabled" : ""}>${k === 0 ? "1st choice" : "Use in box"}</button>`}<button data-gal="remove" data-k="${k}">Remove</button></div></li>`).join("")}</ul>` : ""}
+    ${raw.look ? "" : model3dBlock(raw)}
+    ${raw.look ? `<p class="gal-state">This watch is shown in the box by its own 3D model. Your photographs are kept here.</p>` : raw.spec ? "" : `<p class="gal-state" id="gal-state">${ph.length ? "Checking which photograph can stand in for the watch in the box…" : "No photographs yet. Add some and the watch in the box is built from them."}</p>`}
+    ${ph.length ? `<ul class="gal">${ph.map((p, k) => `<li><button class="ph" data-gal="view" data-k="${k}" aria-label="Show photograph ${k + 1}"><img src="${photoSrc(p)}" data-thumb="${p.thumb || ""}" alt="" loading="lazy"><span class="badge" data-badge="${k}" hidden>In the box</span>${raw.dialPhoto && raw.dialPhoto.photo === k ? `<span class="badge">Dial</span>` : ""}${raw.backPhoto && raw.backPhoto.photo === k ? `<span class="badge b2">Caseback</span>` : ""}</button>
+      <div class="gb">${raw.look ? "" : `<button data-gal="cover" data-k="${k}" ${k === 0 ? "disabled" : ""}>${k === 0 ? "1st choice" : "Use in box"}</button>`}<button data-gal="remove" data-k="${k}">Remove</button></div>
+      ${raw.look ? "" : `<div class="gb2"><button data-gal="dial" data-k="${k}" class="${raw.dialPhoto && raw.dialPhoto.photo === k ? "on" : ""}">Dial</button><button data-gal="back" data-k="${k}" class="${raw.backPhoto && raw.backPhoto.photo === k ? "on" : ""}">Caseback</button></div>`}</li>`).join("")}</ul>` : ""}
     <label class="gal-add"><input type="file" id="gal-in" accept="image/*" multiple>+ Add photographs</label>
     ${galleryBusy ? `<p class="gal-busy" role="status">${esc(galleryBusy)}</p>` : ""}
     ${raw.look ? "" : `<p class="gal-tip">For the watch in the box, the best photograph is taken straight on, dial up, with the bracelet or strap running up and down, on a plain light or dark background (a sheet of paper works). Brand product photos also work well. Other angles, the caseback and the clasp are kept here as your record.</p>`}
@@ -2308,6 +2590,7 @@ function galleryChanged(e){
   e.visual = (e.photos || []).length ? "photo" : "card";
   renderPassport(); heroShow(e, false); refreshGalleryState(e);
   if (isPlaced(e)) boxStale = true;                                // rebuilt when the passport closes
+  if (e.spec) refreshModel(e);
 }
 // Fits the record under the store's document limit: full-size photos live in the asset store, so their small
 // inline copies can go first if needed.
@@ -2342,14 +2625,15 @@ async function addGalleryPhotos(e, files){
 }
 async function removeGalleryPhoto(e, k){
   const p = (e.photos || [])[k]; if (!p) return;
-  e.photos.splice(k, 1); const was = e.visual; e.visual = e.photos.length ? "photo" : "card";
+  const refsBefore = JSON.stringify([e.dialPhoto, e.backPhoto]);
+  e.photos.splice(k, 1); reindexPhotoRefs(e, i => i === k ? null : i > k ? i - 1 : i); const was = e.visual; e.visual = e.photos.length ? "photo" : "card";
   const ok = await saveDoc(e.id, e);
-  if (!ok){ e.photos.splice(k, 0, p); e.visual = was; return; }
+  if (!ok){ e.photos.splice(k, 0, p); e.visual = was; [e.dialPhoto, e.backPhoto] = JSON.parse(refsBefore); if (!e.dialPhoto) delete e.dialPhoto; if (!e.backPhoto) delete e.backPhoto; return; }
   if (p.assetId && CLAUDE.assets) CLAUDE.assets.delete(p.assetId).catch(() => {});
   galleryChanged(e);
 }
 async function coverGalleryPhoto(e, k){
-  const p = e.photos.splice(k, 1)[0]; e.photos.unshift(p);
+  const p = e.photos.splice(k, 1)[0]; e.photos.unshift(p); reindexPhotoRefs(e, i => i === k ? 0 : i < k ? i + 1 : i);
   await saveDoc(e.id, e); galleryChanged(e);
 }
 document.getElementById("pp-body").addEventListener("change", ev => {
@@ -2362,6 +2646,12 @@ document.getElementById("pp-body").addEventListener("click", ev => {
     const im = document.querySelectorAll("#hero-photos img")[k];
     passport.scrollTo({ top:0, behavior:"smooth" }); if (im) setTimeout(() => im.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" }), 350);
   } else if (act === "cover") coverGalleryPhoto(e, k);
+  else if (act === "dial" || act === "back") openAlign(e, k, act);
+  else if (act === "spec") buildSpec(e);
+  else if (act === "nospec"){
+    if (!b.classList.contains("arm")){ b.classList.add("arm"); b.textContent = "Tap to confirm"; setTimeout(() => { if (b.isConnected){ b.classList.remove("arm"); b.textContent = "Remove the 3D model"; } }, 3500); return; }
+    delete e.spec; saveDoc(e.id, e).then(() => refreshModel(e)).then(() => { galleryChanged(e); });
+  }
   else if (act === "remove"){
     if (!b.classList.contains("arm")){ b.classList.add("arm"); b.textContent = "Tap to confirm"; setTimeout(() => { if (b.isConnected){ b.classList.remove("arm"); b.textContent = "Remove"; } }, 3500); return; }
     removeGalleryPhoto(e, k);
@@ -2421,7 +2711,7 @@ function loop(now){
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (box && !state.focus) frameView(false); requestRender(); });
 lidBtn.addEventListener("click", () => setOpen(!state.open));
 document.getElementById("b-reset").addEventListener("click", () => { if (state.focus) unfocus(true); frameView(true, 1.1); });
-addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!document.getElementById("confirm").hidden) document.getElementById("confirm-no").click(); else if (moving) endMove(); else if (!collEl.hidden) closeCollection(); else if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
+addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!alEl.hidden) closeAlign(); else if (!document.getElementById("confirm").hidden) document.getElementById("confirm-no").click(); else if (moving) endMove(); else if (!collEl.hidden) closeCollection(); else if (!addEl.hidden) closeAdd(); else if (passportOpen) closePassport(); else if (state.focus) unfocus(); });
 
 /* ============ start ============ */
 async function start(){
@@ -2445,7 +2735,12 @@ async function start(){
   renderer.domElement.addEventListener("webglcontextlost", () => { B.errors.push("the graphics context was lost (device memory)"); stage("drawing"); __bootShow(); });
   setTimeout(() => { if (!state.open) setOpen(true); }, 1400);
   if (pending.length) setTimeout(() => persistMigration(pending), 1500);
-  window.__ecrin = { camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, BOX, switchTray, startMove, moveTo, placeInBox, removeFromBox, deleteWatch, confirmDelete, openEdit, openCollection, showWatch, planPlacement, isPlaced, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
+  engineReady.then(async m => {
+    const withSpec = COLLECTION.filter(e => e && e.spec); if (!m || !withSpec.length) return;
+    await Promise.all(withSpec.map(prepareDiscs));
+    if (passportOpen || state.focus) boxStale = true; else { buildBox(); renderDock(); requestRender(true); }
+  });
+  window.__ecrin = { straightenDisc, openAlign, camera, controls, box:() => box, CONFIG, applyConfig, buildBox, setOpen, focusCell, openPassport, closePassport, cells:() => cells, hero:() => hero, openAdd, COLLECTION, BOX, switchTray, startMove, moveTo, placeInBox, removeFromBox, deleteWatch, confirmDelete, openEdit, openCollection, showWatch, planPlacement, isPlaced, setViewer:x => { viewer = x; renderPassport(); }, requestRender, M, scene, frameView };
 }
 start().catch(err => { const B = window.__boot; if (B){ B.errors.push("start: " + (err && (err.stack || err.message) || err)); __bootShow(); } console.error(err); });
 </script>
