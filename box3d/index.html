@@ -2432,24 +2432,61 @@ async function refreshModel(e){ discCache.delete(e.id + ":dial"); discCache.dele
 
 /* ---------- 3D spec from photographs (Claude) ---------- */
 let specBusy = null;
+// Hand-made descriptions of exact models (from the owner's watch app). A match is the starting point for Claude.
+const SPEC_LIBRARY = [{"keys":["5968g","aquanaut chronograph"],"name":"Patek Philippe Aquanaut Chronograph 5968G-010","spec":{"bezel":{"color":"#d8dadc","type":"smooth"},"caseColor":"#d8dadc","caseDiameterMm":42,"caseFinish":"polished","caseMaterial":"gold","caseShape":"rounded-octagon","caseThicknessMm":12,"crown":{"guards":true,"pushers":true},"dateWindow":"3","dial":{"accentColor":"#e9ebec","color":"#4a503a","finish":"aquanaut","indexColor":"#e9ebec","indexStyle":"even-arabic","lumeColor":"#eef2e4","trackColor":"#dfe2d8"},"hands":{"color":"#eceeef","lume":true,"secondsColor":"#eceeef","style":"baton"},"lugToLugMm":46,"movementType":"automatic","strap":{"color":"#474c37","stitchColor":"#5a5e46","stripes":[],"type":"integrated"},"subdials":{"color":"#454b35","layout":"6","ringColor":"#d9dcd2"}}},{"keys":["blue planet","ciga"],"name":"CIGA Design Blue Planet II · Atlantic","spec":{"bezel":{"color":"#b5b8bc","type":"smooth"},"caseColor":"#b5b8bc","caseDiameterMm":43,"caseFinish":"polished","caseMaterial":"titanium","caseShape":"round","caseThicknessMm":17,"crown":{"guards":false,"pushers":false},"dateWindow":"none","dial":{"accentColor":"#2f6fe0","color":"#141619","finish":"globe","indexColor":"#d4d8dd","indexStyle":"none","lumeColor":"#e8f0e0","oceanColor":"#2463d8","trackColor":"#c9cdd2"},"hands":{"color":"#e6e9ec","lume":true,"secondsColor":"#e6e9ec","style":"marker"},"lugToLugMm":48,"strap":{"color":"#2a4fb8","stitchColor":"#2a4fb8","stripes":[],"type":"rubber"},"subdials":{"layout":"none"}}},{"keys":["ba-793","btomic enigma","enigma ba"],"name":"BTOMIC Enigma BA-793","spec":{"bezel":{"color":"#d4a084","type":"smooth"},"caseColor":"#d4a084","caseDiameterMm":43,"caseFinish":"polished","caseMaterial":"rose-gold","caseShape":"square","caseThicknessMm":17,"crown":{"guards":false,"pushers":false},"dateWindow":"none","dial":{"accentColor":"#d4a084","color":"#16161a","finish":"lacquer","indexColor":"#e2b496","indexStyle":"applied","lumeColor":"#e9f2dc","trackColor":"#c9977a"},"hands":{"color":"#e2b496","lume":true,"secondsColor":"#e2b496","style":"sword"},"lugToLugMm":50,"roulette":{"gems":true,"trimColor":"#d9a98c","type":"european"},"strap":{"color":"#17130f","stitchColor":"#c9977a","stripes":[],"type":"leather"},"subdials":{"layout":"none"}}},{"keys":["blaue acht","ssx03l101n"],"name":"Audemars Piguet × Swatch Royal Pop · Blaue Acht","spec":{"bezel":{"color":"#6e9bb9","screwColor":"#c9d9e4","screws":true,"type":"smooth"},"caseColor":"#6e9bb9","caseDiameterMm":40,"caseFinish":"matte","caseMaterial":"bioceramic","caseShape":"octagon","caseThicknessMm":9,"crown":{"guards":false,"pushers":false},"dateWindow":"none","dial":{"accentColor":"#5aa7d8","color":"#c9dc84","finish":"tapisserie","indexColor":"#c8d0d6","indexStyle":"applied","lumeColor":"#f2f5ec","trackColor":"#9fb07a"},"hands":{"color":"#c8d0d6","lume":true,"secondsColor":"#c8d0d6","style":"baton"},"lugToLugMm":44,"strap":{"color":"#c9e09c","frameColor":"#c4e08e","stitchColor":"#5aa7d8","stripes":[],"type":"lanyard"},"subdials":{"layout":"none"}}},{"keys":["aerofusion black magic","525.cm.0170","525cm0170"],"name":"Hublot Classic Fusion Aerofusion Chronograph Black Magic 525.CM.0170.RX","spec":{"bezel":{"color":"#1c1c1f","screwColor":"#8e9195","screwCount":6,"screws":true,"type":"smooth"},"caseColor":"#18181a","caseDiameterMm":45,"caseFinish":"polished","caseMaterial":"ceramic","caseShape":"round","caseThicknessMm":13,"crown":{"guards":false,"pushers":true},"dateWindow":"none","dial":{"accentColor":"#c9ccd0","color":"#0d0d0f","finish":"skeleton","indexColor":"#c9ccd0","indexStyle":"applied","lumeColor":"#e6ece0","trackColor":"#8f9398"},"hands":{"color":"#d3d6da","lume":true,"secondsColor":"#d3d6da","style":"baton"},"lugToLugMm":53,"strap":{"color":"#141416","stitchColor":"#141416","stripes":[],"type":"rubber"},"subdials":{"color":"#0d0d0f","layout":"3-9","ringColor":"#9a9ea3"}}}];
+function libraryMatch(e){
+  const d = e.described || {}, hay = [d.brand, d.collection, d.model, d.reference, d.variant, ...(e.sources || []).map(s => s.url || "")].join(" ").toLowerCase();
+  const flat = hay.replace(/[^a-z0-9]/g, "");
+  return SPEC_LIBRARY.find(x => x.keys.some(k => hay.includes(k) || flat.includes(k.replace(/[^a-z0-9]/g, "")))) || null;
+}
+// The photos' main colours, measured here, for when Claude can't be sent the images: background removed via the
+// border colour, then a small k-means. Returns [{hex, share}] largest first.
+async function measureColours(e){
+  const px = [];
+  for (const ph of (e.photos || []).slice(0, 6)){
+    try {
+      const im = await loadImage(ph.assetId ? "/_blob/" + ph.assetId : ph.thumb), S = 72, c = document.createElement("canvas"); c.width = c.height = S;
+      const g = c.getContext("2d", { willReadFrequently:true }); g.drawImage(im, 0, 0, S, S); const d = g.getImageData(0, 0, S, S).data;
+      const border = []; for (let i = 0; i < S; i++) for (const [x, y] of [[i, 0], [i, S - 1], [0, i], [S - 1, i]]){ const k = (y * S + x) * 4; border.push([d[k], d[k + 1], d[k + 2]]); }
+      const med = j => border.map(b => b[j]).sort((a, b) => a - b)[border.length >> 1], bg = [med(0), med(1), med(2)];
+      for (let k = 0; k < d.length; k += 4){ const p = [d[k], d[k + 1], d[k + 2]]; if (Math.hypot(p[0] - bg[0], p[1] - bg[1], p[2] - bg[2]) > 40) px.push(p); }
+    } catch {}
+  }
+  if (px.length < 50) return [];
+  let cs = Array.from({ length:7 }, (_, i) => px[Math.floor((i + 0.5) * px.length / 7)].slice());
+  let lab = new Int32Array(px.length);
+  for (let it = 0; it < 10; it++){
+    const sum = cs.map(() => [0, 0, 0, 0]);
+    px.forEach((p, i) => { let b = 0, bd = 1e9; cs.forEach((c, j) => { const dd = (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2 + (p[2] - c[2]) ** 2; if (dd < bd){ bd = dd; b = j; } }); lab[i] = b; const s = sum[b]; s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; s[3]++; });
+    cs = cs.map((c, j) => sum[j][3] ? [sum[j][0] / sum[j][3], sum[j][1] / sum[j][3], sum[j][2] / sum[j][3]] : c);
+  }
+  const counts = cs.map((_, j) => 0); lab.forEach(j => counts[j]++);
+  const hex = c => "#" + c.map(v => Math.round(v).toString(16).padStart(2, "0")).join("");
+  return cs.map((c, j) => ({ hex:hex(c), share:Math.round(counts[j] / px.length * 100) })).filter(x => x.share >= 3).sort((a, b) => b.share - a.share);
+}
 const SPEC_SHAPE = `{"movementType":"automatic|manual|quartz","caseShape":"round|cushion|square|tonneau|octagon|rounded-octagon","caseDiameterMm":42,"caseThicknessMm":12,"lugToLugMm":50,"caseMaterial":"steel|titanium|gold|rose-gold|bronze|ceramic|bioceramic|plastic|carbon","caseColor":"#rrggbb","caseFinish":"polished|brushed|matte",
 "bezel":{"type":"none|smooth|fluted|tachymeter|dive|gmt","color":"#rrggbb","insertColor":"#rrggbb","insertColor2":"#rrggbb","textColor":"#rrggbb","screws":false,"screwCount":6,"screwColor":"#rrggbb"},
 "dial":{"color":"#rrggbb","finish":"sunburst|matte|gloss|guilloche|lacquer|tapisserie|aquanaut|skeleton|globe","indexStyle":"baton|applied|arabic|roman|dots|mixed|even-arabic|none","indexColor":"#rrggbb","lumeColor":"#rrggbb","trackColor":"#rrggbb","accentColor":"#rrggbb"},
 "subdials":{"layout":"none or clock positions joined by '-' from 3/6/9/12, e.g. 3-9","color":"#rrggbb","ringColor":"#rrggbb"},"dateWindow":"none|3|4.5|6",
 "hands":{"style":"baton|sword|dauphine|leaf|alpha|syringe","color":"#rrggbb","secondsColor":"#rrggbb","lume":true},"crown":{"guards":false,"pushers":false},
-"strap":{"type":"leather|rubber|nato|velcro|bracelet|fabric|integrated","color":"#rrggbb","stitchColor":"#rrggbb","stripes":[]},"note":"one short sentence: what this parametric model cannot show of the real watch"}`;
-function specPrompt(e, nPhotos){
+"strap":{"type":"leather|rubber|nato|velcro|bracelet|fabric|integrated|lanyard","color":"#rrggbb","stitchColor":"#rrggbb","stripes":[],"frameColor":"#rrggbb"},"note":"one short sentence: what this parametric model cannot show of the real watch"}`;
+function specPrompt(e, nPhotos, lib, colours){
   const d = e.described || {};
   return `You are building a parametric 3D description of ONE wristwatch owned by a collector, for a renderer that draws: case outline, bezel (optionally with screws), a printed dial, subdials, date window, hands, crown/pushers and strap.
 Watch: ${[d.brand, d.collection, d.model, d.reference, d.variant].filter(Boolean).join(" · ") || "unknown"}.
 ${nPhotos ? `${nPhotos} photograph(s) of the actual watch are attached. Trust them over general knowledge for colours, dial layout, subdial positions, date window (only if visible), bezel screws, strap type.` : "No photograph is attached: use your knowledge of this exact model; when unsure, choose the plainest option."}
-Rules: colours are "#rrggbb" sampled to match the real watch (black ceramic is not pure black: about #18181a). Sizes in millimetres from the brand's specification when you know it. dateWindow "none" unless the watch really shows a date window. subdials.layout "none" when there are no subdials. Never invent decorations.
+${lib ? `A reference description of this exact model (${lib.name}) exists. Start from it and change only what the photographs or measured colours show differently:\n${JSON.stringify(lib.spec)}\n` : ""}${colours && colours.length ? `Main colours measured from the owner's photographs (background removed; share of the watch's pixels): ${colours.map(c => `${c.hex} ${c.share}%`).join(", ")}. These are the real colours: assign them to case, bezel, dial, strap and indices as fits this model (shadows make some measurements darker).\n` : ""}Rules: strap "lanyard" = a pocket watch in an octagonal frame on a neck cord (e.g. the Swatch × Audemars Piguet Royal Pop); "integrated" = no lugs, the strap flows from the case. Colours are "#rrggbb" sampled to match the real watch (black ceramic is not pure black: about #18181a). Sizes in millimetres from the brand's specification when you know it. dateWindow "none" unless the watch really shows a date window. subdials.layout "none" when there are no subdials. Never invent decorations.
 Reply with JSON only, exactly this shape (pick one value where options are listed with |):
 ${SPEC_SHAPE}`;
 }
 async function buildSpec(e){
   await CLAUDE.ready;
-  if (!CLAUDE.sample){ toastBox("Building the model needs Claude, which isn't available in this view."); return; }
+  const lib = libraryMatch(e);
+  if (!CLAUDE.sample){
+    if (lib){ e.spec = { ...JSON.parse(JSON.stringify(lib.spec)), __from:"library", __note:"" }; await saveDoc(e.id, e); await refreshModel(e); renderPassport(); toastBox("3D model set from Écrin's reference description of this model."); }
+    else toastBox("Building the model needs Claude, which isn't available in this view.");
+    return;
+  }
   specBusy = e.id; renderPassport();
   try {
     let images = [];
@@ -2461,15 +2498,17 @@ async function buildSpec(e){
         try { const im = await loadImage(ph.assetId ? "/_blob/" + ph.assetId : ph.thumb); const c = toJpeg(im, 1024, 0.85); images.push(await new Promise(r => c.toBlob(r, "image/jpeg", 0.85))); } catch {}
       }
     }
-    const raw = await CLAUDE.sample.json(specPrompt(e, images.length), images.length ? { images, modelTier:"complex" } : { modelTier:"complex" });
+    const colours = images.length ? [] : await measureColours(e);
+    window.__boot && __boot.mark(`model: ${images.length} images, ${colours.length} measured colours, library ${lib ? lib.name : "none"}`);
+    const raw = await CLAUDE.sample.json(specPrompt(e, images.length, lib, colours), images.length ? { images, modelTier:"complex" } : { modelTier:"complex" });
     if (!raw || typeof raw !== "object" || !raw.caseShape) throw new Error("no spec");
     const spec = ENG ? ENG.cleanSpec(raw) : raw;
     if (raw.subdials && /none/i.test(raw.subdials.layout || "")) delete spec.subdials;
     spec.__note = typeof raw.note === "string" ? raw.note.slice(0, 200) : "";
-    spec.__from = images.length ? "photos" : "identification";
+    spec.__from = images.length ? "photos" : colours.length ? "measured-colours" : "identification";
     e.spec = JSON.parse(JSON.stringify(raw)); e.spec.__note = spec.__note; e.spec.__from = spec.__from; delete e.spec.note; if (e.spec.subdials && /none/i.test(e.spec.subdials.layout || "")) delete e.spec.subdials;
     await saveDoc(e.id, e); await refreshModel(e);
-    toastBox(images.length ? "3D model built from your photographs." : "3D model built from the identification (photographs couldn't be sent).");
+    toastBox(images.length ? "3D model built from your photographs." : colours.length ? "3D model built with the colours measured from your photographs." : "3D model built from the identification (photographs couldn't be sent).");
   } catch (err) { console.warn("spec", err); toastBox("The model couldn't be built. Try again in a moment."); }
   finally { specBusy = null; renderPassport(); }
 }
