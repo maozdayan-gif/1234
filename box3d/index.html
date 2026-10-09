@@ -1458,7 +1458,7 @@ function newDraft(slot){
     private:{ serial:null, purchaseDate:null, price:null, source:null, notes:"", documents:[] } };
 }
 // A source only fills a field if it is empty or the new value is more trustworthy. Manual input always wins.
-const RANK = { manual:3, link:2, photo:1, search:3 };
+const RANK = { manual:3, link:2, "link-ai":2, photo:1, search:3 };
 function contribute(source, values, confidence = {}){
   for (const [k, v] of Object.entries(values)){
     if (v === undefined || v === null || v === "") continue;
@@ -1614,8 +1614,8 @@ document.getElementById("addw-back").addEventListener("click", addBack);
 document.getElementById("addw-close").addEventListener("click", closeAdd);
 document.getElementById("b-add").addEventListener("click", () => openAdd(null));
 
-const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "catalogue" ? "From catalogue" : f.source === "photo" ? `AI · ${f.confirmed ? "confirmed by you" : CONF_WORD(f.confidence) + " confidence"}` : f.source === "link" ? "From link" : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
-const srcList = () => draft.sources.length ? `<ul class="srcs">${draft.sources.map(s => `<li>${s.type === "photo" ? `<img src="${s.thumb}" alt="">Photo` : s.type === "link" ? `<span class="lk">↗</span><span class="u">${esc(s.url)}</span><em>${s.status === "failed" ? "kept as a source" : s.status === "partial" ? "partly read" : "read"}</em>` : "Manual entry"}</li>`).join("")}</ul>` : "";
+const chip = f => f ? `<span class="prov-chip prov-${f.source}">${f.source === "catalogue" ? "From catalogue" : f.source === "photo" ? `AI · ${f.confirmed ? "confirmed by you" : CONF_WORD(f.confidence) + " confidence"}` : f.source === "link" ? "From link" : f.source === "link-ai" ? `AI · from the link · ${CONF_WORD(f.confidence)} confidence` : f.source === "search" ? "From search" : "Entered by you"}</span>` : "";
+const srcList = () => draft.sources.length ? `<ul class="srcs">${draft.sources.map(s => `<li>${s.type === "photo" ? `<img src="${s.thumb}" alt="">Photo` : s.type === "link" ? `<span class="lk">↗</span><span class="u">${esc(s.url)}</span><em>${s.status === "failed" ? "kept as a source" : s.status === "partial" ? "partly read" : s.status === "ai" ? "read by AI" : "read"}</em>` : "Manual entry"}</li>`).join("")}</ul>` : "";
 
 function drawAdd(){
   const T = { method:"Add a watch", photo:"Identify from photos", link:"Identify from a link", analyzing:"Identifying", result:"Identification", search:"Find the reference", details:"Confirm the details", place:"Place it in the box" };
@@ -1643,11 +1643,11 @@ const VIEWS = {
     <div class="acts"><button class="pri" id="ph-go" ${n ? "" : "disabled"}>${draft.ai ? "Identify again" : "Identify"}</button><button class="sec" data-go="link">Paste a link</button><button class="sec" data-go="details" data-manual="1">Add manually</button></div>`;
   },
   link: () => `<label class="fld"><span>Page address</span><input id="ln-in" type="url" inputmode="url" placeholder="https://" autocomplete="off"></label>
-    <p class="hint-s">Écrin reads what the address itself shows, such as the brand's site or a reference in the link. The page isn't opened yet. The link is always kept with the watch.</p>
+    <p class="hint-s">Claude reads what the address itself says: the brand, collection, model and reference in the link. The page isn't opened. The link is always kept with the watch.</p>
     <div class="acts"><button class="pri" id="ln-go">Read the link</button><button class="sec" data-go="details" data-manual="1">Add manually instead</button></div>`,
   analyzing: () => `<div class="ladder ${draft._linkRun ? "" : "thinking"}">${LEVELS.map(l => `<div class="rung" data-l="${l}"><span class="dot"></span><span>${LEVEL_LABEL[l]}</span><em></em></div>`).join("")}</div>
-    <p class="hint-s" id="an-msg">${draft._linkRun ? "Reading the link" : "Studying the dial, bezel, case, bracelet, clasp and caseback. This usually takes under a minute."}</p>
-    ${draft._linkRun ? "" : `<p class="hint-s" id="an-time" aria-live="off"></p><div class="acts col"><button class="sec" id="an-stop">Stop</button></div>`}`,
+    <p class="hint-s" id="an-msg">${draft._linkRun ? "Reading what the address says about the watch. The page itself isn't opened." : "Studying the dial, bezel, case, bracelet, clasp and caseback. This usually takes under a minute."}</p>
+    ${draft._linkRun ? `<div class="acts col"><button class="sec" id="an-stop">Stop</button></div>` : `<p class="hint-s" id="an-time" aria-live="off"></p><div class="acts col"><button class="sec" id="an-stop">Stop</button></div>`}`,
   error: () => {
     const E = { not_granted:["Permission needed", "Photo identification uses your Claude account and needs your permission. Reload the page and allow it when asked, or continue another way."],
       unavailable:["Not available here", "Photo identification works when Écrin is opened in Claude. Your photos are kept; you can continue another way."],
@@ -1858,9 +1858,65 @@ async function runPhoto(){
     addError = e.code; addGo("error");
   }
 }
+// Claude reads the address itself (the page cannot be opened from here). Product addresses usually name the
+// collection, model and reference. A reference is only asserted when it is literally in the address.
+function linkPrompt(url, hint){
+  return `A watch collector pasted this web address of a page showing a watch they own:
+${url}
+
+You cannot open the page. Read only what the address itself says (domain, path, slug, query), and your general knowledge of how watch brands and retailers name their pages and products.
+Identify the watch on five levels, each judged independently: brand, collection, model, reference, variant.
+Rules. Accuracy matters more than completeness.
+- confidence: "high" = the address states it plainly (e.g. a reference number or model name in the slug); "medium" = strongly implied; "low" = a weak hint; "none" = cannot tell, and then value is null.
+- reference: give it only if a reference or product code appears in the address; write it in the brand's usual form. Never invent one.
+- variant: only what the address states (dial colour, material, size).
+- evidence: one short phrase per level naming the part of the address you used (at most 14 words).
+${hint ? `- The domain belongs to ${hint}.
+` : ""}- If the address does not concern a wristwatch, set isWatch to false.
+Reply with JSON only, in exactly this shape:
+{"isWatch":true,"levels":{"brand":{"value":null,"confidence":"none","evidence":""},"collection":{"value":null,"confidence":"none","evidence":""},"model":{"value":null,"confidence":"none","evidence":""},"reference":{"value":null,"confidence":"none","evidence":""},"variant":{"value":null,"confidence":"none","evidence":""}},"candidates":[],"observations":{},"photoAdvice":""}`;
+}
+async function readLinkAI(url, hint){
+  await CLAUDE.ready;
+  if (!CLAUDE.sample) return null;
+  const ctl = new AbortController(), timer = setTimeout(() => { ctl.timedOut = true; ctl.abort(); }, 60000);
+  idAbort = ctl;
+  try {
+    const r = normalizeAI(await CLAUDE.sample.json(linkPrompt(url, hint), { modelTier:"default", signal:ctl.signal }));
+    if (!r.isWatch) return { levels:null };
+    const ref = r.levels.reference, inUrl = ref.value && normRef(decodeURIComponent(url)).includes(normRef(ref.value));
+    if (ref.value && !inUrl) ref.conf = Math.min(ref.conf, 0.5);          // not in the address: offered, never asserted
+    if (r.levels.brand.value) r.levels.brand.value = canonBrand(r.levels.brand.value);
+    if (ref.value) ref.value = cleanRef(ref.value).value;
+    return r;
+  } catch (e) { console.warn("link ai", e); return { error:ctl.timedOut ? "timeout" : (e && e.code) || "failed" }; }
+  finally { clearTimeout(timer); idAbort = null; }
+}
 async function runLink(url){
   draft._linkRun = true; addBusy = true; addGo("analyzing");
-  const res = readLink(url);
+  let res = readLink(url);
+  if (res.status !== "parsed"){
+    addBody.querySelector(".ladder")?.classList.add("thinking");
+    const ai = await readLinkAI(url, res.fields.brand);
+    addBody.querySelector(".ladder")?.classList.remove("thinking");
+    if (ai && (ai.error === "cancelled" || ai.error === "aborted")){ addBusy = false; addGo("link"); toastAdd("Stopped."); return; }
+    if (ai && ai.levels){
+      const L = ai.levels, fields = {}, conf = {};
+      for (const l of LEVELS) if (L[l].value){ fields[l] = L[l].value; conf[l] = L[l].conf; }
+      if (res.fields.brand && !fields.brand){ fields.brand = res.fields.brand; conf.brand = 1; }
+      const known = indexMatch(fields.reference);
+      draft.sources.push({ type:"link", url, status:Object.keys(fields).length ? "ai" : "failed", extracted:fields, at:new Date().toISOString() });
+      await climb(conf);
+      addBusy = false;
+      if (!Object.keys(fields).length){ addGo("details"); toastAdd("Nothing could be read from this address. The link is saved with the watch; add the details yourself."); return; }
+      contribute("link-ai", fields, conf); if (!draft.identification.method) draft.identification.method = "link";
+      draft.identification.linkAI = { levels:L, at:new Date().toISOString() };
+      if (known && (conf.reference ?? 0) >= CONFIDENT){ draft.catalogueId = known.catalogueId || null; }
+      addGo("details");
+      toastAdd(`Read by AI from the address. Not verified: check the details below.${known ? "" : (conf.reference ?? 0) >= CONFIDENT ? " This reference isn't in Écrin's index yet." : ""}`);
+      return;
+    }
+  }
   const conf = Object.fromEntries(LEVELS.map(l => [l, res.fields[l] ? 1 : 0]));
   await climb(res.status === "failed" ? null : conf);
   draft.sources.push({ type:"link", url, status:res.status, extracted:res.fields, at:new Date().toISOString() });
