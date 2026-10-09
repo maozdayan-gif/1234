@@ -1034,10 +1034,16 @@ function buildBox(){
       const worn = new THREE.Group(); worn.rotation.x = WATCH_TILT; cushion.add(worn);
       worn.add(buildBand(w));
       head = buildWatch(w); liveWatches.add(head.userData.hands); boxHandSets.push(head.userData.hands); head.position.y = CUSH_R + STRAP_OFF + STRAP_T * 0.5; worn.add(head);
-    } else if (entry){ head = entry.spec && ENG ? buildEngineHead(entry) : buildStandIn(entry); cushion.add(head); }
+    } else if (entry){
+      head = null;
+      if (entry.spec && ENG){ try { head = buildEngineHead(entry); } catch (err) { console.warn("engine watch", err); window.__boot && (__boot.errors.push("engine watch " + entry.id + ": " + (err && err.message || err)), __boot.send && __boot.send()); } }
+      if (!head) head = buildStandIn(entry);
+      cushion.add(head);
+    }
     cell.userData = { slot:i, pos:{ tray:activeTray, row:r, col:c }, watch:w || (entry ? { standIn:true } : null), entry, head, cushion };
     box.add(cell); cells.push(cell);
   }
+  if (window.__boot) __boot.mark(`box built: ${BOX.layout} cells, tray ${activeTray}, ` + cells.map(c => c.userData.head ? (c.userData.head.userData.kind || "look")[0] : "-").join("") + (ENG ? "" : " (engine not loaded)"));
   // front hardware: clasp, keyhole, plaque
   const clasp = mesh(new RoundedBoxGeometry(3.0, 1.3, 0.16, 1, 0.025), M.metal); clasp.position.set(0, FEET + BASE_H - 0.75, OD / 2 + 0.08);
   const kh = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.4, 20), M.keyhole); kh.rotation.x = Math.PI / 2; kh.position.set(0, FEET + BASE_H - 0.75, OD / 2 + 0.12); kh.scale.set(0.7, 0.5, 0.7);
@@ -2448,6 +2454,7 @@ async function buildSpec(e){
   try {
     let images = [];
     const caps = await CLAUDE.sample.limits().catch(() => null);
+    window.__boot && __boot.mark("model: sample limits " + (caps ? JSON.stringify(caps).slice(0, 160) : "none"));
     if (caps && caps.images){
       const max = Math.min(4, caps.images.maxCount || 1);
       for (const ph of (e.photos || []).slice(0, max)){
